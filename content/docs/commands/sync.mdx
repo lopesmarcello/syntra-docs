@@ -6,6 +6,44 @@ section: commands
 
 ## syntra sync
 
-Sync your Syntra config to all configured AI adapters.
+`syntra sync` regenerates all adapter output files from the canonical `ai/` source files.
 
-> Content coming soon.
+```bash
+syntra sync
+```
+
+## Target-specific sync
+
+You can sync a single adapter by passing the corresponding flag:
+
+```bash
+syntra sync --copilot
+syntra sync --claude
+syntra sync --cursor
+```
+
+This is useful when you only want to update one tool's configuration without touching the others.
+
+## What gets generated
+
+| Flag | Generated files |
+|---|---|
+| `--copilot` | `.github/copilot-instructions.md`, `.github/agents/*.md` |
+| `--claude` | `.claude/CLAUDE.md` |
+| `--cursor` | `.cursor/rules/*.mdc` |
+
+Running `syntra sync` with no flag generates output for all enabled adapters as configured in `ai/config.yml`.
+
+<Callout variant="warning" title="Adapter output is overwritten">
+  `syntra sync` always overwrites adapter output files. Do not edit files inside `.github/`, `.claude/`, or `.cursor/` directly — changes will be lost on the next sync.
+</Callout>
+
+## Auto-sync
+
+Set `sync.autoSync: true` in `ai/config.yml` to trigger a silent sync automatically after every `syntra add` operation:
+
+```yaml
+# ai/config.yml
+sync:
+  autoSync: true
+```

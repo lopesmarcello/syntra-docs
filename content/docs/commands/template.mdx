@@ -6,6 +6,34 @@ section: commands
 
 ## syntra template
 
-Save and list reusable templates.
+`syntra template` lets you save the current `ai/` setup as a reusable template and list previously saved templates.
 
-> Content coming soon.
+## Saving a template
+
+```bash
+syntra template save my-team-template
+```
+
+This saves your current `ai/` configuration under the given name so it can be reused when initialising future projects.
+
+## Listing templates
+
+```bash
+syntra template list
+```
+
+Outputs all templates you have previously saved.
+
+## Storage location
+
+Saved templates are stored at:
+
+```text
+~/.syntra/templates/
+```
+
+This is a user-level directory, so templates are available across all your projects on the same machine.
+
+<Callout variant="tip">
+  Use `syntra template save` after dialling in your team's `ai/` setup on the first project, then reuse that template when setting up future projects with `syntra init`.
+</Callout>

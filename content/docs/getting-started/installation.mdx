@@ -6,16 +6,36 @@ section: getting-started
 
 ## Installing Syntra
 
-Install Syntra globally via npm:
+Syntra supports three installation methods depending on your workflow.
 
-```bash
-npm install -g syntra
-```
+### Run with npx (recommended)
 
-Or run it directly with npx:
+No installation required. Run Syntra directly in your project directory:
 
 ```bash
 npx syntra init
 ```
 
-> Content coming soon.
+This is the fastest way to get started without committing to a global install.
+
+### Global install
+
+Install Syntra globally so the `syntra` command is available everywhere:
+
+```bash
+npm install -g syntra
+syntra --help
+```
+
+### Local development usage
+
+If you are contributing to Syntra or want to run from source:
+
+```bash
+npm run build
+node dist/index.js --help
+```
+
+<Callout variant="tip" title="Next step">
+  After installing, run `syntra init` in your project root to scaffold the `ai/` directory and generate your first adapter files.
+</Callout>

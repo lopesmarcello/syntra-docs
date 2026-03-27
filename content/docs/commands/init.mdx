@@ -6,6 +6,37 @@ section: commands
 
 ## syntra init
 
-Initialize Syntra in your project directory.
+`syntra init` bootstraps the Syntra framework in your project with an interactive setup wizard.
 
-> Content coming soon.
+```bash
+syntra init
+# or
+npx syntra init
+```
+
+## What it does
+
+<Steps>
+  <Step title="Scans your project">
+    Detects language, framework, package manager, and CI provider from your project files.
+  </Step>
+  <Step title="Prompts for instruction templates">
+    Lets you choose which instruction categories to scaffold (architecture, style, security, testing, deploy).
+  </Step>
+  <Step title="Prompts for agents">
+    Lets you select which agent personas to create (code-generator, code-reviewer, bug-fixer, task-planner).
+  </Step>
+  <Step title="Prompts for adapter targets">
+    Asks which AI tools you use — GitHub Copilot, Claude Code, and/or Cursor — so only the relevant adapters are enabled.
+  </Step>
+  <Step title="Creates the ai/ structure">
+    Writes `ai/config.yml` and all selected instruction and agent files to `ai/instructions/` and `ai/agents/`.
+  </Step>
+  <Step title="Runs initial adapter sync">
+    Automatically runs `syntra sync` so adapter output files are ready to use immediately.
+  </Step>
+</Steps>
+
+<Callout variant="tip">
+  You only need to run `syntra init` once per project. After that, use `syntra add` to add new files and `syntra sync` to regenerate adapter outputs.
+</Callout>

@@ -6,6 +6,28 @@ section: commands
 
 ## syntra done
 
-Mark a task as complete and move it to the done directory.
+`syntra done <taskId>` marks a task as complete by moving its file from the active directory to the done directory.
 
-> Content coming soon.
+```bash
+syntra done TASK-001
+```
+
+## What it does
+
+The command moves the task file from:
+
+```
+ai/tasks/{tasks.activeDir}/{taskId}.task.md
+```
+
+to:
+
+```
+ai/tasks/{tasks.doneDir}/{taskId}.task.md
+```
+
+The source and destination directories are read from `ai/config.yml` (`tasks.activeDir` and `tasks.doneDir`). The defaults are `active` and `done`.
+
+<Callout variant="tip">
+  Run `syntra validate` after closing tasks to confirm the framework is still in a consistent state.
+</Callout>

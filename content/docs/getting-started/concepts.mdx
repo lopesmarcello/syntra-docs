@@ -6,6 +6,66 @@ section: getting-started
 
 ## Core Concepts
 
-Instructions, agents, tasks, skills, and adapters explained.
+Syntra organises AI-assisted development around a single principle: **`ai/` is the source of truth**. Everything else is a generated artifact.
 
-> Content coming soon.
+## The `ai/` directory
+
+All your instructions, agents, tasks, and skills live inside `ai/`. You edit files there, then run `syntra sync` to regenerate adapter-specific files. The adapter folders — `.github/`, `.claude/`, `.cursor/` — are never edited directly.
+
+<Callout variant="warning" title="Do not edit adapter output directly">
+  Changes made inside `.github/`, `.claude/`, or `.cursor/` will be overwritten on the next `syntra sync`. Always edit the source files in `ai/` instead.
+</Callout>
+
+## Canonical directory structure
+
+After `syntra init`, your project gains the following structure:
+
+```text
+project-root/
+├── ai/
+│   ├── config.yml
+│   ├── instructions/
+│   │   ├── architecture.instructions.md
+│   │   ├── style.instructions.md
+│   │   └── ...
+│   ├── agents/
+│   │   ├── code-generator.agent.md
+│   │   ├── code-reviewer.agent.md
+│   │   └── ...
+│   ├── skills/
+│   │   └── *.skill.md
+│   └── tasks/
+│       ├── active/
+│       └── done/
+├── .github/      ← Copilot adapter output
+├── .claude/      ← Claude adapter output
+└── .cursor/      ← Cursor adapter output
+```
+
+## Key concepts
+
+### Instructions
+
+Markdown files (`.instructions.md`) that define how your project should be built — architecture rules, style guidelines, security policies, and more. They are referenced by agents and synced to each adapter.
+
+### Agents
+
+Markdown files (`.agent.md`) that describe specialised AI personas — a code generator, a bug fixer, a code reviewer. Each agent references one or more instructions and is synced to adapter-specific agent definitions.
+
+### Tasks
+
+Markdown files (`.task.md`) that capture a discrete unit of work to be executed by an agent. Active tasks live in `ai/tasks/active/` and are moved to `ai/tasks/done/` via `syntra done <taskId>`.
+
+### Skills
+
+Markdown files (`.skill.md`) that describe reusable, domain-specific knowledge an agent can apply — for example, API pagination patterns or date utility conventions.
+
+### Adapters
+
+Adapters translate the canonical `ai/` files into the specific format expected by each AI tool:
+
+| Adapter | Output files |
+|---|---|
+| GitHub Copilot | `.github/copilot-instructions.md`, `.github/agents/*.md` |
+| Claude Code | `.claude/CLAUDE.md` |
+| Cursor | `.cursor/rules/*.mdc` |

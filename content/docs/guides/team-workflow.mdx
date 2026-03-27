@@ -6,6 +6,71 @@ section: guides
 
 ## Team Workflow
 
-Using Syntra effectively in a team environment.
+The typical Syntra workflow follows seven steps from project setup through task execution and validation.
 
-> Content coming soon.
+## The 7-step workflow
+
+<Steps>
+  <Step title="Initialize">
+    Run `syntra init` in your project root. The interactive wizard scans your project, prompts for instruction templates, agents, and adapter targets, then writes the `ai/` structure and runs an initial sync.
+
+    ```bash
+    syntra init
+    ```
+  </Step>
+  <Step title="Customize instructions">
+    Open the generated instruction files and tailor them to your team's standards. This is where you encode your architecture decisions, style rules, security requirements, and testing expectations.
+
+    ```bash
+    $EDITOR ai/instructions/architecture.instructions.md
+    ```
+  </Step>
+  <Step title="Add a task">
+    Create a new task file for the work you want an AI agent to execute. The interactive prompt generates a properly structured task file with a unique ID.
+
+    ```bash
+    syntra add task
+    ```
+  </Step>
+  <Step title="Sync adapters">
+    Regenerate all adapter output files from the canonical `ai/` source. Do this after any edit to instructions, agents, or skills.
+
+    ```bash
+    syntra sync
+    ```
+  </Step>
+  <Step title="Execute the task with your coding agent">
+    Open your AI tool (Copilot, Claude Code, or Cursor) and reference the task. For example, in Claude Code:
+
+    ```
+    /TASK-001
+    ```
+
+    The agent will read the task instructions and carry out the steps.
+  </Step>
+  <Step title="Mark done">
+    Once the task is complete, move it from active to done:
+
+    ```bash
+    syntra done TASK-001
+    ```
+  </Step>
+  <Step title="Validate">
+    Run a final validation to confirm everything is consistent and the adapter output is in sync with the `ai/` source.
+
+    ```bash
+    syntra validate
+    ```
+  </Step>
+</Steps>
+
+## Team tips
+
+- Commit the entire `ai/` directory to version control — it is your team's shared source of truth.
+- Commit adapter output files (`.github/`, `.claude/`, `.cursor/`) as well so every developer has working adapter configs without needing to run `syntra sync` themselves.
+- Use `sync.warnManualEdits: true` in `ai/config.yml` to catch accidental direct edits to adapter output.
+- Add `syntra validate` to your CI pipeline to prevent drift.
+
+<Callout variant="info" title="Template reuse">
+  Once your team has refined a setup, run `syntra template save <name>` to preserve it for future projects.
+</Callout>

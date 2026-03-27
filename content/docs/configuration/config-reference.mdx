@@ -6,6 +6,93 @@ section: configuration
 
 ## Config Reference
 
-Full config.yml field reference.
+All Syntra configuration lives in `ai/config.yml`. Below is a reference for every top-level section.
 
-> Content coming soon.
+## `project`
+
+Describes the project profile detected (or set) during `syntra init`.
+
+```yaml
+project:
+  name: my-app
+  language: typescript
+  framework: next.js
+  packageManager: npm
+  monorepo: false
+```
+
+| Key | Type | Description |
+|---|---|---|
+| `name` | `string` | Project name |
+| `language` | `string` | Primary programming language |
+| `framework` | `string` | Framework in use (e.g. `next.js`, `express`) |
+| `packageManager` | `string` | Package manager (`npm`, `pnpm`, `yarn`) |
+| `monorepo` | `boolean` | Whether the project is a monorepo |
+
+## `adapters`
+
+Configures which AI tool adapters are enabled and how instructions are assembled.
+
+```yaml
+adapters:
+  copilot:
+    enabled: true
+    instructionsMode: concatenated
+  claude:
+    enabled: false
+    instructionsMode: concatenated
+  cursor:
+    enabled: false
+    instructionsMode: individual
+```
+
+| Key | Values | Description |
+|---|---|---|
+| `<adapter>.enabled` | `true` / `false` | Whether this adapter is generated on `syntra sync` |
+| `<adapter>.instructionsMode` | `concatenated` / `individual` | `concatenated` joins all instructions into one file; `individual` writes a separate file per instruction |
+
+Supported adapter keys: `copilot`, `claude`, `cursor`.
+
+## `sync`
+
+Controls sync behaviour.
+
+```yaml
+sync:
+  autoSync: false
+  warnManualEdits: true
+```
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `autoSync` | `boolean` | `false` | When `true`, every `syntra add` silently triggers `syntra sync` |
+| `warnManualEdits` | `boolean` | `true` | When `true`, `syntra validate` warns if adapter files appear to have been manually edited |
+
+## `tasks`
+
+Configures task ID generation and directory layout.
+
+```yaml
+tasks:
+  idPrefix: TASK-
+  activeDir: active
+  doneDir: done
+```
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `idPrefix` | `string` | `TASK-` | Prefix for auto-generated task IDs |
+| `activeDir` | `string` | `active` | Subdirectory inside `ai/tasks/` for active tasks |
+| `doneDir` | `string` | `done` | Subdirectory inside `ai/tasks/` for completed tasks |
+
+## `language`
+
+Sets the language used for generated content.
+
+```yaml
+language: en
+```
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `language` | `string` | `en` | ISO language code for generated file content |

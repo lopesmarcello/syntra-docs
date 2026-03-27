@@ -6,6 +6,63 @@ section: commands
 
 ## syntra add
 
-Add an instruction, agent, task, or skill to your project.
+`syntra add <type> [name]` scaffolds a new file in the `ai/` directory from a built-in template.
 
-> Content coming soon.
+```bash
+syntra add <type> [name]
+```
+
+## Supported types
+
+| Type | Description |
+|---|---|
+| `instruction` | A new instruction file in `ai/instructions/` |
+| `agent` | A new agent file in `ai/agents/` |
+| `task` | A new task file in `ai/tasks/active/` (interactive) |
+| `skill` | A new skill file in `ai/skills/` |
+
+## Examples
+
+```bash
+syntra add instruction microfrontends
+syntra add agent bug-fixer
+syntra add task
+syntra add skill api-pagination
+```
+
+## Auto-sync
+
+If `sync.autoSync: true` is set in `ai/config.yml`, every `add` operation silently triggers an adapter sync so output files stay up to date.
+
+```yaml
+# ai/config.yml
+sync:
+  autoSync: true
+```
+
+## Task configuration keys
+
+When adding a `task`, Syntra reads the following keys from `ai/config.yml` to determine IDs and directories:
+
+| Key | Default | Description |
+|---|---|---|
+| `tasks.idPrefix` | `TASK-` | Prefix prepended to the auto-incremented task number |
+| `tasks.activeDir` | `active` | Subdirectory inside `ai/tasks/` for active tasks |
+| `tasks.doneDir` | `done` | Subdirectory inside `ai/tasks/` for completed tasks |
+
+## Task template contract
+
+Every task file created by `syntra add task` must contain the following required headings to pass `syntra validate`:
+
+- `Context`
+- `References`
+- `Dependencies`
+- `Steps`
+- `Acceptance Criteria`
+- `Notes`
+
+Task files must be placed at `ai/tasks/{tasks.activeDir}/{taskId}.task.md` while active, and the task ID prefix must match `tasks.idPrefix`.
+
+<Callout variant="info" title="Example task file">
+  See the [Writing Tasks](/docs/guides/writing-tasks) guide for a full annotated example.
+</Callout>

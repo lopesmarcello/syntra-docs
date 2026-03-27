@@ -6,6 +6,31 @@ section: commands
 
 ## syntra validate
 
-Validate your Syntra configuration and content files.
+`syntra validate` checks your framework for correctness and sync freshness.
 
-> Content coming soon.
+```bash
+syntra validate
+```
+
+## Validation checks
+
+The command performs the following checks:
+
+- **Config schema** — `ai/config.yml` has the required structure and valid values
+- **Instruction naming/format** — instruction files follow the `.instructions.md` naming convention
+- **Agent references** — each agent references instructions that actually exist
+- **Task structure** — task files contain all required headings: `Context`, `References`, `Dependencies`, `Steps`, `Acceptance Criteria`, `Notes`
+- **Task references** — agents and instructions referenced inside task files exist
+- **Sync freshness** — detects signals that adapter output may have been manually edited or is out of date
+
+## Exit behavior
+
+| Result | Exit code |
+|---|---|
+| All checks pass | `0` |
+| One or more **errors** found | Non-zero (failure) |
+| **Warnings** only | `0` (process does not fail) |
+
+<Callout variant="info">
+  Run `syntra validate` in CI to catch drift between the `ai/` source and adapter output before changes are merged.
+</Callout>

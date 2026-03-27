@@ -1,0 +1,39 @@
+# TASK-001: Update docs with content from Syntra GitHub source
+
+## Context
+The syntra-docs site currently has MDX pages for commands, installation, configuration, concepts, and guides that are incomplete or contain placeholder content. The Syntra GitHub repo (https://github.com/lopesmarcello/Syntra) contains authoritative, up-to-date information covering all commands, installation methods, config reference, canonical project structure, and the typical workflow. This task supplements existing MDX content with accurate details sourced from the README and repo, without removing anything already written.
+
+## References
+- **Agent**: [code-generator](../agents/code-generator.agent.md)
+- **Instructions**:
+  - [architecture](../instructions/architecture.instructions.md)
+  - [style](../instructions/style.instructions.md)
+
+## Dependencies
+None
+
+## Steps
+1. [ ] Fetch/review the Syntra README at https://github.com/lopesmarcello/Syntra to extract all sections (Install, Canonical Structure, Commands, Configuration, Task Template Contract, Typical Workflow)
+2. [ ] Update `content/docs/getting-started/installation.mdx` — add `npx syntra init`, global install (`npm i -g syntra`), and local dev usage steps
+3. [ ] Update `content/docs/getting-started/concepts.mdx` — document the `ai/` source-of-truth principle, canonical directory structure, and adapter generation model
+4. [ ] Update `content/docs/commands/init.mdx` — describe what `syntra init` does (project scan, prompts, creates `ai/` structure, runs initial sync)
+5. [ ] Update `content/docs/commands/add.mdx` — document all supported types (`instruction`, `agent`, `task`, `skill`), examples, autoSync behavior, and task config keys
+6. [ ] Update `content/docs/commands/done.mdx` — document `syntra done <taskId>` and the active→done directory move
+7. [ ] Update `content/docs/commands/sync.mdx` — document `syntra sync`, target-specific flags (`--copilot`, `--claude`, `--cursor`), and what each adapter generates
+8. [ ] Update `content/docs/commands/validate.mdx` — document all validation checks, exit behavior (non-zero on errors, warnings pass)
+9. [ ] Update `content/docs/commands/template.mdx` — document `syntra template save <name>` and `syntra template list`, and the `~/.syntra/templates/` storage location
+10. [ ] Update `content/docs/configuration/config-reference.mdx` — document all `ai/config.yml` sections: `project`, `adapters`, `sync`, `tasks`, `language`
+11. [ ] Update `content/docs/guides/team-workflow.mdx` (or `index.mdx`) — add the typical 7-step workflow from the README (init → customize → add task → sync → execute → done → validate)
+12. [ ] Review all updated files for consistency with existing MDX formatting and component usage in the project
+
+## Acceptance Criteria
+- [ ] Every updated MDX page accurately reflects the Syntra GitHub README without contradicting existing correct content
+- [ ] All six commands (`init`, `add`, `done`, `sync`, `validate`, `template`) have their own fully documented page
+- [ ] `config-reference.mdx` covers every top-level key in `ai/config.yml`
+- [ ] Installation page covers all three install methods (npx, global, local dev)
+- [ ] Concepts page explains the `ai/`-as-source-of-truth model and adapter generation
+- [ ] No existing accurate content is removed or overwritten with less detail
+- [ ] All MDX files pass the Next.js dev/build without errors
+
+## Notes
+Source of truth for all content is the Syntra GitHub README (https://github.com/lopesmarcello/Syntra). Where the existing MDX already has accurate content, supplement rather than replace. Keep MDX component usage (e.g. `<Callout>`, `<Steps>`, `<CodeBlock>`) consistent with the patterns already present in the `content/docs/` directory.
