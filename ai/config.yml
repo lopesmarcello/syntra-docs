@@ -1,0 +1,25 @@
+version: 1
+project:
+  name: syntra-docs
+  language: typescript
+  framework: next.js
+  packageManager: npm
+  monorepo: false
+adapters:
+  copilot:
+    enabled: true
+    instructionsMode: concatenated
+  claude:
+    enabled: false
+    instructionsMode: concatenated
+  cursor:
+    enabled: false
+    instructionsMode: individual
+sync:
+  autoSync: false
+  warnManualEdits: true
+tasks:
+  idPrefix: TASK-
+  activeDir: active
+  doneDir: done
+language: en
