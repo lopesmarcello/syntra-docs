@@ -1,0 +1,30 @@
+# TASK-1: Audit and update architecture instructions to match the actual project
+
+## Context
+The architecture instructions in `ai/instructions/architecture.instructions.md` describe a generic Next.js project structure that does not match the actual codebase. For example, it references a `src/` root and subdirectories (`hooks/`, `services/`, `types/`, `ui/`, `features/`) that do not exist. The project is the source of truth, so the instructions must be updated to reflect the real directory layout, actual naming patterns used, and conventions observed in the codebase — not hypothetical ones.
+
+## References
+- **Agent**: [code-generator](../agents/code-generator.agent.md)
+- **Instructions**:
+  - [architecture](../instructions/architecture.instructions.md)
+
+## Dependencies
+None
+
+## Steps
+1. [ ] Walk through every section of `architecture.instructions.md` and list each claim that differs from the real project (directory tree, naming conventions, import patterns, component structure, module organization)
+2. [ ] Replace the `Project Structure` section with the accurate directory tree, removing `src/` prefix and non-existent directories (`hooks/`, `services/`, `types/`)
+3. [ ] Update the `components/` subsection to reflect the real layout (`components/ui/` → does not exist; actual layout is `components/docs/` for feature components)
+4. [ ] Verify naming conventions and import order claims against actual files in `app/`, `components/`, `lib/`, `config/`, `content/`
+5. [ ] Update or remove any other claims (e.g. Error Handling patterns, Enums usage) that are not evidenced in the codebase
+6. [ ] Confirm the updated instructions accurately describe both the docs-site content layer (`content/docs/`) and the rendering layer (`app/docs/`)
+
+## Acceptance Criteria
+- [ ] Every directory mentioned in the `Project Structure` section exists in the actual workspace
+- [ ] No references to `src/`, `hooks/`, `services/`, `types/`, `ui/`, or `features/` unless those directories actually exist
+- [ ] Naming convention examples match real filenames found in the project
+- [ ] All structural claims are verified against the real files — no hypothetical guidance remains
+- [ ] The updated file passes `syntra sync` without warnings about manual edits (if warnManualEdits is relevant)
+
+## Notes
+The project is a Next.js documentation site (syntra-docs). The `content/` directory holds MDX source files structured by topic, while `app/docs/` handles rendering. This docs-site context should be reflected in the Project Overview section as well. No code changes are needed — this task is documentation / instructions only.

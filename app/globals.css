@@ -4,17 +4,32 @@
 @variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  /* Warm, brownish palette inspired by Monokai and Claude design language */
+  --background: #f9f6f2;
+  --foreground: #1a1410;
   --surface: #ffffff;
-  --surface-subtle: #eff4ff;
-  --border: #d9e2f2;
-  --foreground-muted: #475569;
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
+  --surface-subtle: #f2e8e0;
+  --border: #e6d9ce;
+  --foreground-muted: #6b6157;
+  --accent: #a0704f;
+  --accent-hover: #8b5a3c;
   --accent-foreground: #ffffff;
-  --accent-soft: #dbeafe;
-  --focus-ring: #3b82f6;
+  --accent-soft: #f1dfd3;
+  --focus-ring: #a0704f;
+
+  /* Code block styling */
+  --code-bg: #f0e8e0;
+  --code-text: #1a1410;
+
+  /* Callout variant colors - warm palette */
+  --callout-info-border: #c9b8a8;
+  --callout-info-bg: #f5f0eb;
+  --callout-warning-border: #d4a457;
+  --callout-warning-bg: #faf6f0;
+  --callout-tip-border: #a4a878;
+  --callout-tip-bg: #f5f7f0;
+  --callout-danger-border: #c86b5c;
+  --callout-danger-bg: #faf5f3;
 }
 
 @theme inline {
@@ -34,21 +49,61 @@
 }
 
 .dark {
-  --background: #020617;
-  --foreground: #e2e8f0;
-  --surface: #0f172a;
-  --surface-subtle: #172554;
-  --border: #1e293b;
-  --foreground-muted: #94a3b8;
-  --accent: #60a5fa;
-  --accent-hover: #93c5fd;
-  --accent-foreground: #0f172a;
-  --accent-soft: #1e3a8a;
-  --focus-ring: #60a5fa;
+  --background: #0f0c0a;
+  --foreground: #f0e8e2;
+  --surface: #1a1410;
+  --surface-subtle: #27201a;
+  --border: #3d332a;
+  --foreground-muted: #a89888;
+  --accent: #d4a76a;
+  --accent-hover: #e5b67a;
+  --accent-foreground: #0f0c0a;
+  --accent-soft: #3d2817;
+  --focus-ring: #d4a76a;
+
+  /* Code block styling for dark mode */
+  --code-bg: #0f0c0a;
+
+  /* Callout variant colors - warm dark palette */
+  --callout-info-border: #4a3f38;
+  --callout-info-bg: #1a1410;
+  --callout-warning-border: #6b5a3f;
+  --callout-warning-bg: #1f1916;
+  --callout-tip-border: #515245;
+  --callout-tip-bg: #1a1c17;
+  --callout-danger-border: #6b4742;
+  --callout-danger-bg: #2a1f1d;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+}
+
+/* Typography refinements for improved readability */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+p {
+  line-height: 1.7;
+}
+
+code {
+  font-size: 0.9em;
+}
+
+/* Improve focus ring visibility with warm palette */
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }

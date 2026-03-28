@@ -75,7 +75,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
             return <code className={className}>{children}</code>;
         },
         pre: ({ children }) => (
-            <pre className="mb-4 mt-6 overflow-x-auto rounded-lg border border-zinc-200 bg-zinc-950 p-4 dark:border-zinc-800">
+            <pre className="mb-4 mt-6 overflow-x-auto rounded-lg border border-border p-4" style={{ backgroundColor: 'var(--code-bg, #1a1410)' }}>
                 {children}
             </pre>
         ),
@@ -85,7 +85,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
             </div>
         ),
         tr: ({ children }) => (
-            <tr className="m-0 border-t p-0 even:bg-zinc-50 dark:even:bg-zinc-900">{children}</tr>
+            <tr className="m-0 border-t border-border p-0 even:bg-surface-subtle">{children}</tr>
         ),
         th: ({ children }) => (
             <th className="border px-4 py-2 text-left font-bold [[align=center]]:text-center [[align=right]]:text-right">

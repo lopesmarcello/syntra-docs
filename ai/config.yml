@@ -16,7 +16,7 @@ adapters:
     enabled: false
     instructionsMode: individual
 sync:
-  autoSync: false
+  autoSync: true 
   warnManualEdits: true
 tasks:
   idPrefix: TASK-
