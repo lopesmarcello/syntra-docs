@@ -1,11 +1,113 @@
 ---
 title: Custom Instructions
-description: How to create your own custom instruction files.
+description: Create domain-specific instruction modules and connect them to your agents.
 section: instructions
 ---
 
 ## Custom Instructions
 
-How to create your own custom instruction files.
+Built-in instruction modules cover core engineering concerns, but most teams need additional domain rules. Custom instruction files let you encode those standards once and apply them consistently across agents.
 
-> Content coming soon.
+## When to add custom instructions
+
+Add custom modules when your team has rules that are not already covered by architecture, style, testing, security, or deploy guidance.
+
+Common examples:
+
+- API design contracts
+- Accessibility standards
+- Observability/logging policy
+- Data modeling and migration policy
+- Performance budgets
+- Domain-specific compliance requirements
+
+## Naming patterns
+
+Use predictable, kebab-case filenames in `ai/instructions/`:
+
+- `api.instructions.md`
+- `accessibility.instructions.md`
+- `observability.instructions.md`
+- `performance.instructions.md`
+
+Pattern:
+
+```text
+ai/instructions/<domain>.instructions.md
+```
+
+Keep one domain per file. If a file grows too broad, split into focused modules.
+
+## File structure
+
+Follow the same structure used by built-in modules so agents can parse and apply rules consistently.
+
+Recommended template:
+
+```markdown
+# <Domain> Instructions
+
+## Scope
+[What this file governs and what it does not govern]
+
+## Rules
+- [Concrete rule 1]
+- [Concrete rule 2]
+
+## Required Patterns
+- [Preferred implementation pattern]
+
+## Prohibited Patterns
+- [Forbidden pattern with rationale]
+
+## Validation Checklist
+- [ ] [Verifiable condition]
+- [ ] [Verifiable condition]
+```
+
+Write rules as actionable constraints, not general advice.
+
+## Integrating custom instructions into agents
+
+Agents consume instruction files through their **Instruction Files** section in `ai/agents/*.agent.md`.
+
+### Example: reference a custom instruction from an agent
+
+```markdown
+## Instruction Files
+- **architecture.instructions.md** — Project structure and module boundaries
+- **testing.instructions.md** — Test standards and coverage
+- **api.instructions.md** — API contract and response conventions (custom)
+```
+
+If a task requires extra domain constraints, reference those custom instruction files in the task’s `## References` section too.
+
+## Integration workflow
+
+1. Create `ai/instructions/<domain>.instructions.md`.
+2. Add it to one or more agent files in `ai/agents/` under **Instruction Files**.
+3. Reference it in relevant `.task.md` files.
+4. Run `syntra sync` so adapter outputs include the updated instruction context.
+5. Run `syntra validate` to confirm generated outputs and config remain consistent.
+
+## Authoring best practices
+
+- Keep each module focused on one concern.
+- Avoid contradicting built-in instruction files.
+- Prefer specific rules with examples over broad guidance.
+- Review custom modules whenever team standards or tooling changes.
+- Keep agent references up to date when modules are added, renamed, or removed.
+
+## Common mistakes
+
+- **Vague guidance**: “write high quality APIs” instead of explicit response/validation rules.
+- **Overlapping files**: duplicating the same rule in multiple modules.
+- **Missing agent references**: file exists but no agent reads it.
+- **No sync after updates**: adapter outputs drift from canonical `ai/` sources.
+
+## Related pages
+
+- [Instructions Overview](/docs/instructions)
+- [Architecture Instructions](/docs/instructions/architecture)
+- [Agents](/docs/agents)
+

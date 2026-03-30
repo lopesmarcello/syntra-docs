@@ -1,11 +1,62 @@
 ---
 title: Testing Instructions
-description: Testing instruction template reference.
+description: Define test strategy, conventions, and quality gates agents must enforce.
 section: instructions
 ---
 
 ## Testing Instructions
 
-Testing instruction template reference.
+Testing instructions define how quality is verified before changes are accepted. They standardize what to test, how to structure tests, and how to keep coverage meaningful.
 
-> Content coming soon.
+Source file: `ai/instructions/testing.instructions.md`
+
+## Purpose
+
+Use this module to ensure new logic ships with reliable, maintainable tests.
+
+It should clearly define:
+
+- Which testing layers your project uses
+- Where test files live and how they are named
+- Which behaviors and edge cases are required
+- What mocking practices are acceptable
+- Coverage goals and expectations for critical paths
+
+## Key sections
+
+The built-in testing module currently includes:
+
+- **Test Stack** — unit/integration, component, and E2E tooling.
+- **Test File Conventions** — file naming and co-location patterns.
+- **What to Test** — logic, integration points, user behavior, and error paths.
+- **What NOT to Test** — avoid framework internals and implementation details.
+- **Test Structure** — Arrange/Act/Assert and one behavior per test.
+- **Naming Convention** — clear `describe` and behavior-driven `it/test` phrasing.
+- **Mocking** — boundary mocking patterns and reset strategy.
+- **Coverage** — global and critical-path targets.
+- **AI Instructions for Writing Tests** — mandatory testing behavior for generated code.
+
+## When to customize
+
+Customize testing instructions when:
+
+- Your stack differs (for example Vitest-only or Playwright-only workflows)
+- You require stricter coverage thresholds
+- You enforce additional gates (contract tests, snapshot policy)
+- Your team has specific mocking or fixture standards
+
+Keep criteria measurable. Ambiguous statements like “add good tests” are hard for agents and reviewers to enforce.
+
+## Authoring tips
+
+- Write expectations as pass/fail rules whenever possible.
+- Include edge-case guidance for your domain (for example locale, timezone, or permission matrix rules).
+- Align this file with CI checks so local guidance and automated gates do not diverge.
+- Revisit coverage expectations periodically; quality standards should evolve with project maturity.
+
+## Related pages
+
+- [Style Instructions](/docs/instructions/style)
+- [Security Instructions](/docs/instructions/security)
+- [Deploy Instructions](/docs/instructions/deploy)
+

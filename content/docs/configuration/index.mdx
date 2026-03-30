@@ -1,11 +1,81 @@
 ---
 title: Configuration
-description: Overview of the Syntra config.yml file.
+description: Overview of the Syntra config.yml file and how its sections work together.
 section: configuration
 ---
 
 ## Configuration
 
-Overview of the Syntra config.yml file.
+All Syntra behaviour is driven by a single file, `ai/config.yml`, located at the root of the `ai/` directory. It is created automatically when you run `syntra init` and can be edited at any time without re-running init.
 
-> Content coming soon.
+## File location
+
+```text
+your-project/
+└── ai/
+    └── config.yml   ← single source of truth
+```
+
+## Top-level sections
+
+`ai/config.yml` is divided into five top-level sections. Each controls a distinct part of the framework.
+
+| Section | Purpose |
+|---|---|
+| [`project`](/docs/configuration/project-detection) | Metadata about your project (name, language, framework). Set by `syntra init` via project detection and overridable at any time. |
+| [`adapters`](/docs/configuration/config-reference#adapters) | Which AI tool adapters are enabled and how instructions are assembled for each. |
+| [`sync`](/docs/configuration/config-reference#sync) | Controls whether sync runs automatically after `syntra add` and whether manual-edit warnings are active. |
+| [`tasks`](/docs/configuration/config-reference#tasks) | Task ID prefix and the directory names used for active and completed tasks inside `ai/tasks/`. |
+| [`language`](/docs/configuration/config-reference#language) | ISO language code for generated file content. |
+
+## Minimal example
+
+The file created by `syntra init` looks similar to this:
+
+```yaml
+version: 1
+project:
+  name: my-app
+  language: typescript
+  framework: next.js
+  packageManager: npm
+  monorepo: false
+adapters:
+  copilot:
+    enabled: true
+    instructionsMode: concatenated
+  claude:
+    enabled: false
+    instructionsMode: concatenated
+  cursor:
+    enabled: false
+    instructionsMode: individual
+sync:
+  autoSync: false
+  warnManualEdits: true
+tasks:
+  idPrefix: TASK-
+  activeDir: active
+  doneDir: done
+language: en
+```
+
+## Editing the config
+
+You can open and edit `ai/config.yml` directly at any time. After saving changes, run `syntra sync` to regenerate adapter output files so they reflect the updated configuration.
+
+```bash
+syntra sync
+```
+
+Run `syntra validate` to confirm the file is well-formed and consistent with the rest of the `ai/` directory:
+
+```bash
+syntra validate
+```
+
+## Related pages
+
+- [Config Reference](/docs/configuration/config-reference) — complete field-by-field documentation for every key.
+- [Project Detection](/docs/configuration/project-detection) — how `syntra init` populates the `project` section and how to override it.
+- [Templates](/docs/configuration/templates) — how to save and reuse your `ai/` setup across projects.

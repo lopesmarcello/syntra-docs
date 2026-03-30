@@ -1,0 +1,30 @@
+# TASK-10: Author Instructions Section Content
+
+## Context
+The instructions section and all instruction-specific pages are still placeholders. This task documents what instructions are, how they are consumed by agents, and how to author each built-in instruction type plus custom instruction modules.
+
+## References
+- **Agent**: [code-generator](../agents/code-generator.agent.md)
+- **Instructions**:
+  - [architecture](../instructions/architecture.instructions.md)
+  - [style](../instructions/style.instructions.md)
+
+## Dependencies
+TASK-3
+
+## Steps
+1. [ ] Use `ai/tasks/active/TASK-3-audit.md` to confirm scope for `content/docs/instructions/{index,architecture,deploy,security,style,testing,custom}.mdx`.
+2. [ ] Replace placeholders in all seven instruction pages with complete, practical documentation.
+3. [ ] For each built-in instruction page, summarize purpose, key sections, and when teams should customize it.
+4. [ ] For `instructions/custom.mdx`, define naming patterns, file structure, and how to integrate custom instruction files into agent references.
+5. [ ] Ensure section language is consistent with agent docs and avoids contradictions with current instruction files.
+
+## Acceptance Criteria
+- [ ] All seven placeholder pages in `instructions/` are fully authored.
+- [ ] Built-in instruction pages align with their source files in `ai/instructions/`.
+- [ ] Custom instruction guidance includes concrete authoring and integration patterns.
+- [ ] Links between instruction overview and child pages are valid.
+- [ ] No placeholder text remains in the instructions section.
+
+## Notes
+- Primary sources: `ai/instructions/{architecture,deploy,security,style,testing}.instructions.md`, `ai/agents/*.agent.md`, `ai/config.yml`.

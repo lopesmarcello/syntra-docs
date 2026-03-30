@@ -1,11 +1,53 @@
 ---
 title: Cursor
-description: Cursor adapter details and configuration.
+description: Cursor adapter outputs, config toggles, and sync behavior.
 section: adapters
 ---
 
 ## Cursor
 
-Cursor adapter details and configuration.
+The Cursor adapter converts Syntra's `ai/` source files into Cursor Rules files.
 
-> Content coming soon.
+## Generated files
+
+When Cursor sync runs, Syntra writes:
+
+- `.cursor/rules/*.mdc`
+
+Each generated rule file is derived from your instruction and agent definitions.
+
+## Configuration
+
+Cursor behavior is controlled in `ai/config.yml`:
+
+```yaml
+adapters:
+	cursor:
+		enabled: false
+		instructionsMode: individual
+```
+
+| Key | Effect |
+|---|---|
+| `enabled` | If `true`, Cursor output is included in default `syntra sync` |
+| `instructionsMode` | Controls how instruction content is split before rendering (`concatenated` or `individual`) |
+
+This project currently sets `adapters.cursor.enabled: false`, so standard sync does not update `.cursor/`.
+
+## Sync behavior
+
+Use:
+
+```bash
+syntra sync --cursor
+```
+
+or enable Cursor and run a full sync:
+
+```bash
+syntra sync
+```
+
+<Callout variant="warning" title="Do not maintain .cursor files by hand">
+	Files in `.cursor/rules/` are generated output and are overwritten by `syntra sync`.
+</Callout>

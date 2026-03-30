@@ -21,7 +21,7 @@ The command performs the following checks:
 - **Agent references** — each agent references instructions that actually exist
 - **Task structure** — task files contain all required headings: `Context`, `References`, `Dependencies`, `Steps`, `Acceptance Criteria`, `Notes`
 - **Task references** — agents and instructions referenced inside task files exist
-- **Sync freshness** — detects signals that adapter output may have been manually edited or is out of date
+- **Sync freshness** — when `sync.warnManualEdits` is enabled, detects signals that adapter output may have been manually edited or is out of date
 
 ## Exit behavior
 

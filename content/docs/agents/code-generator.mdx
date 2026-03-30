@@ -1,11 +1,244 @@
 ---
 title: Code Generator
-description: The code generator agent reference.
+description: How the code generator agent works and what to expect.
 section: agents
 ---
 
 ## Code Generator
 
-The code generator agent reference.
+The code generator agent implements tasks step by step, following your project instructions precisely. It works methodically — writing code, tests, and configuration changes while waiting for review between steps.
 
-> Content coming soon.
+## When to Use Code Generator
+
+Use code generator when:
+- ✅ You have a concrete `.task.md` file with clear steps
+- ✅ The scope is well-defined and bounded
+- ✅ You're ready to start implementation
+- ✅ You need code written following your project's patterns and standards
+
+**Don't use code generator when:**
+- ❌ The requirement is vague or unclear — use [Task Planner](/docs/agents/task-planner) first
+- ❌ You're fixing a bug without clear diagnosis — use [Bug Fixer](/docs/agents/bug-fixer) instead
+- ❌ You need an independent review — use [Code Reviewer](/docs/agents/code-reviewer) on completed work
+
+## How Code Generator Works
+
+### Phase 1: Preparation
+
+Before executing any task, code generator:
+
+1. **Reads the task completely** — Understands context, all steps, and acceptance criteria
+2. **Identifies affected files** — Determines which files will be created or modified
+3. **Checks for clarity** — If anything is unclear or contradictory, **stops and asks** before proceeding
+
+This preparation prevents misunderstanding and false starts.
+
+### Phase 2: Execution
+
+For each step in the task, code generator:
+
+**a) Announces** what it's about to do
+- "I'll create `lib/formatDate.ts` following the utility pattern in `lib/`"
+
+**b) Searches** for existing patterns
+- Looks at similar files in the same directory
+- Matches naming, structure, style, and conventions
+- Never invents patterns — always copies from existing code
+
+**c) Implements** the change
+- Writes code following your project instructions
+- Creates tests alongside implementation
+- Follows the exact structure your project uses
+
+**d) Reports** what was done:
+   - Which files were created, modified, or deleted
+   - Summary of changes (2-3 sentences)
+   - Key decisions made (and why)
+   - Any concerns or trade-offs
+
+**e) Waits** for your review
+- **Never skips ahead**, not even for seemingly simple steps
+- Always gives you a chance to catch issues before the next step
+- Incorporates your feedback before moving forward
+
+### Phase 3: Completion
+
+After all steps:
+1. Verifies all acceptance criteria are met
+2. Lists any remaining items needing attention
+3. Marks the task ready for final review
+
+## Instruction Compliance
+
+Code generator always reads these files before working:
+
+| Instruction | Why It Matters |
+|---|---|
+| **architecture.instructions.md** | Where code goes, how modules are organized, naming conventions, import order |
+| **style.instructions.md** | Code formatting, patterns, component structure, comments, code quality |
+| **testing.instructions.md** | Test conventions, what to test, how to structure tests, what NOT to test |
+| **security.instructions.md** | Input validation, secrets, SQL injection prevention, output encoding, safe patterns |
+
+If your task references additional instruction files, code generator reads those too.
+
+## Scope Discipline
+
+Code generator **Only** changes what the task asks for. It **never**:
+
+❌ Refactors surrounding code, even if it could be improved
+❌ Adds features not mentioned in the task
+❌ Updates dependencies unless the task requires it
+❌ Modifies config files (tsconfig, eslint, etc.) unless the task requires it
+❌ Fixes other bugs it notices (reports them instead)
+
+If code generator notices something that should be fixed but it's out of scope, it mentions this in the report but doesn't change it. This keeps tasks focused and prevents scope creep.
+
+### Example: Scope Discipline in Action
+
+**Task**: "Add email validation to the LoginForm component"
+
+Code generator will:
+✅ Add email validation to LoginForm
+✅ Write tests for the validation
+✅ Follow existing error message patterns
+
+Code generator will **NOT**:
+❌ Refactor the form's styling (out of scope)
+❌ Add password strength validation (not asked for)
+❌ Update the form's layout (not asked for)
+❌ Fix unrelated accessibility issues (out of scope)
+
+## Output Format
+
+When reporting a completed step, code generator uses this format:
+
+```markdown
+### Step N: [Step title from task]
+
+**Files changed:**
+- `path/to/file.ts` — [created/modified/deleted]: brief description
+
+**What was done:**
+[2-3 sentence summary of the implementation]
+
+**Key decisions:**
+- [Any non-obvious choice you made and why]
+
+**Waiting for review before proceeding to Step N+1.**
+```
+
+### Example Report
+
+```markdown
+### Step 1: Create isDateAfterToday utility function
+
+**Files changed:**
+- `lib/dateUtils.ts` — created: New utility for date comparison
+- `lib/dateUtils.test.ts` — created: Comprehensive test coverage
+
+**What was done:**
+Created `isDateAfterToday(dateStr: string): boolean` that returns true only for dates
+strictly after today. Handles empty strings, null, and invalid dates by returning false.
+Used date-fns for parsing and comparison, matching the pattern in `lib/formatDate.ts`.
+
+**Key decisions:**
+- Used `startOfDay` to ignore time component when comparing (matches existing date logic)
+- Placed in new `lib/dateUtils.ts` rather than inline in the component (follows architecture.instructions)
+- Imported date-fns functions used by other utilities (consistent with existing code)
+
+**Waiting for review before proceeding to Step 2.**
+```
+
+## Workflow Example
+
+Here's what a typical task execution looks like:
+
+```
+1. You assign a task: "Create user profile form"
+   ↓
+2. Code Generator reads the task and project instructions
+   ↓
+3. For each step:
+   a) Announces the step
+   b) Searches for patterns in existing code
+   c) Implements the change
+   d) Reports what was done
+   e) Waits for your review
+   ↓
+4. You provide feedback (approve, request changes, ask questions)
+   ↓
+5. Code Generator incorporates feedback and moves to the next step
+   ↓
+6. After all steps, verifies acceptance criteria are met
+   ↓
+7. Task ready for final review and merge
+```
+
+## What Code Generator Never Does
+
+Code generator will **never**:
+
+❌ Generate placeholder or mock implementations (unless the task explicitly asks for it)
+❌ Leave TODO comments for things the current task should complete
+❌ Invent requirements not in the task
+❌ Make assumptions about business logic (asks when in doubt)
+❌ Skip writing tests for new logic
+❌ Commit changes without explicit approval
+
+## If Something Goes Wrong
+
+If code generator encounters a problem:
+
+### Ambiguous Requirements
+- **Stops and asks** which interpretation is correct
+- Presents options if multiple valid approaches exist
+- Never guesses
+
+### Conflicting Instructions
+- **Flags the conflict** between project instructions and the task
+- Waits for guidance before proceeding
+- Defaults to following existing code patterns until clarified
+
+### Out-of-Scope Needs
+- **Identifies when changes require modifying** files outside the task scope
+- Asks for permission before proceeding
+- Documents what would need to change
+
+### Missing Information
+- **Identifies what's unclear** in the task or project setup
+- Asks specific questions to unblock
+- Never proceeds without clarity
+
+## Tips for Working With Code Generator
+
+### Write Clear Task Files
+- Be specific about what to build
+- Break down work into reviewable steps
+- Include concrete file paths and function names
+- Define acceptance criteria clearly
+
+### Keep Instructions Current
+- Update `architecture.instructions.md` when your project structure changes
+- Update `style.instructions.md` when your team's standards change
+- Update `testing.instructions.md` to reflect what you value
+- Update `security.instructions.md` with company policies
+
+### Review Between Steps
+- Read the report carefully
+- Ask questions if anything is unclear
+- Request changes before moving forward
+- Catch issues early rather than after all steps are done
+
+### Assign Reasonable Tasks
+- Map out the work before assigning it
+- Break large features into multiple tasks
+- Make sure dependencies are clear
+- Set acceptance criteria that are verifiable
+
+## See Also
+
+- **[Agents Overview](/docs/agents)** — Understand the agent model
+- **[Task Planner](/docs/agents/task-planner)** — Break down requirements into tasks
+- **[Code Reviewer](/docs/agents/code-reviewer)** — Review code quality
+- **[Architecture Instructions](/docs/instructions/architecture)** — Project structure standards
+- **[Style Instructions](/docs/instructions/style)** — Code quality standards

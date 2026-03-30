@@ -1,11 +1,420 @@
 ---
 title: Custom Agents
-description: How to create your own custom agents.
+description: Create your own domain-specific agents following Syntra patterns.
 section: agents
 ---
 
 ## Custom Agents
 
-How to create your own custom agents.
+The built-in agents ([Code Generator](/docs/agents/code-generator), [Bug Fixer](/docs/agents/bug-fixer), [Code Reviewer](/docs/agents/code-reviewer), [Task Planner](/docs/agents/task-planner)) handle common development workflows. But your team may have domain-specific work that deserves its own agent.
 
-> Content coming soon.
+This guide explains how to create custom agents that follow Syntra patterns.
+
+## When to Create a Custom Agent
+
+Consider creating a custom agent when:
+
+✅ **Recurring workflow** — Your team does the same type of work repeatedly
+✅ **Clear scope** — The work has defined inputs, outputs, and constraints
+✅ **Complex process** — The workflow has multiple phases or decision points
+✅ **Domain-specific** — The work requires specialized knowledge of your project
+
+Examples of custom agents:
+
+| Team | Custom Agent | Why |
+|---|---|---|
+| Mobile team | QA Acceptance Agent | Checks iOS/Android builds, device compatibility, screenshots |
+| Data team | Data Pipeline Agent | Creates ETL jobs, tests data quality, documents schemas |
+| DevOps team | Infrastructure Agent | Provisions cloud resources, updates deployment configs, writes IaC |
+| Security team | Compliance Auditor | Scans for security vulnerabilities, checks compliance rules |
+| Documentation team | Doc Writer | Generates documentation from code, maintains specs |
+
+**Don't create a custom agent when:**
+- ❌ The task is a one-time thing — use one of the built-in agents instead
+- ❌ It's really just [Code Generator](/docs/agents/code-generator) with different instructions
+- ❌ The workflow is still being figured out — define it first, then create the agent
+
+## Custom Agent Pattern
+
+All Syntra agents follow the same pattern:
+
+```
+1. Role (what is this agent?)
+2. Instruction Files (what guidelines does it follow?)
+3. Workflow (what are the steps?)
+4. Rules & Constraints (what can/can't it do?)
+5. Output Format (how does it report results?)
+```
+
+Let's build a custom QA agent as an example.
+
+## Example: QA Acceptance Agent
+
+### Step 1: Define the Agent File
+
+Create a new `.agent.md` file in `ai/agents/`:
+
+**`ai/agents/qa-acceptance.agent.md`**
+
+```markdown
+# QA Acceptance Agent
+
+## Role
+You are a quality assurance specialist that validates builds against acceptance criteria
+and project quality standards. You run automated tests, verify functionality, and ensure
+the build meets requirements before approval.
+
+## Instruction Files
+- **testing.instructions.md** — Test standards and coverage expectations
+- **architecture.instructions.md** — Project structure and naming conventions
+- **style.instructions.md** — Code quality and patterns
+- **security.instructions.md** — Input validation and safety checks
+
+## How to Validate a Build
+
+### Phase 1: Understand Requirements
+- Read the task being tested (what should this build do?)
+- Identify acceptance criteria that must be verified
+- Understand what "done" looks like
+
+### Phase 2: Automated Testing
+1. Run unit test suite
+2. Run integration tests
+3. Check code coverage meets your threshold (>80%)
+4. Run linters and type checkers
+5. Report any failures with specific details
+
+### Phase 3: Functional Verification
+1. Build the application (compile, bundle, etc.)
+2. Start the application in test environment
+3. Test happy path workflows from the task
+4. Test edge cases mentioned in acceptance criteria
+5. Test error scenarios
+
+### Phase 4: Quality Checks
+1. Check for console.logs or debug code
+2. Verify error messages are helpful
+3. Check performance isn't degraded
+4. Verify accessibility basics (keyboard nav, focus, etc.)
+
+### Phase 5: Report Results
+Frame results as: Passed ✅ / Failed 🔴 / Warnings ⚠️
+
+## Rules
+- Never approve a build with test failures
+- Never approve with critical security issues
+- Report specific failures, not "something broke"
+- Provide remediation steps when failures occur
+
+## Output Format
+```
+## Build Validation Report
+
+**Build ID**: [identifier]
+**Task**: [what was being tested]
+**Date**: [when tested]
+
+### Test Results
+- Unit Tests: ✅ Passed (412 tests)
+- Integration Tests: ✅ Passed (28 tests)
+- Code Coverage: ✅ 87% (exceeds 80% threshold)
+- Linting: ✅ No errors
+
+### Functional Tests
+- Happy path: ✅ Login → Dashboard → Profile → Logout works
+- Edge cases: ⚠️ Very long names (>100 chars) cause text overflow
+- Error handling: ✅ Invalid email shows helpful error message
+
+### Quality Checks
+- Debug code: ✅ None found
+- Error messages: ✅ All are helpful
+- Performance: ✅ No degradation
+- Accessibility: ⚠️ Tab order not optimal in dialog
+
+### Verdict
+**Status**: ✅ APPROVED with minor warnings
+
+**Issues**: 2 warnings (cosmetic, not blocking)
+**Recommendations**: Fix text overflow in name field before next release
+
+**Ready for deployment.**
+```
+```
+
+### Step 2: Update Configuration (If Needed)
+
+If your custom agent needs to be discoverable through `syntra config`, update `ai/config.yml`:
+
+```yaml
+agents:
+  code-generator: ./ai/agents/code-generator.agent.md
+  bug-fixer: ./ai/agents/bug-fixer.agent.md
+  code-reviewer: ./ai/agents/code-reviewer.agent.md
+  task-planner: ./ai/agents/task-planner.agent.md
+  # Add your custom agent
+  qa-acceptance: ./ai/agents/qa-acceptance.agent.md
+```
+
+### Step 3: Create Documentation
+
+Create a documentation page in `content/docs/agents/`:
+
+**`content/docs/agents/qa-acceptance.mdx`**
+
+```markdown
+---
+title: QA Acceptance Agent
+description: How the QA acceptance agent validates builds.
+section: agents
+---
+
+## QA Acceptance Agent
+
+The QA acceptance agent validates builds against acceptance criteria and quality standards.
+[Rest of documentation follows the patterns of other agent pages]
+```
+
+### Step 4: Link From Index
+
+Update `content/docs/agents/index.mdx` to include your new agent:
+
+```markdown
+### [QA Acceptance](/docs/agents/qa-acceptance)
+**When**: You need to validate a build before deployment.
+
+**What it does**: Runs automated tests, verifies functionality against acceptance criteria,
+checks code quality, and approves or rejects the build.
+
+**Specialties**: Automated testing, quality gates, build validation.
+```
+
+## Custom Agent Best Practices
+
+### Instruction Files
+
+Create or reference instruction files that define standards:
+
+**✅ Good approach:**
+```markdown
+## Instruction Files
+- **testing.instructions.md** — Test standards and coverage expectations
+- **api.instructions.md** — API design and security standards (custom)
+- **deployment.instructions.md** — Deployment process and checklist (custom)
+```
+
+**❌ Poor approach:**
+```markdown
+## Instruction Files
+- Use whatever standards you think are good
+```
+
+Documenting standards makes agents consistent and predictable.
+
+### Workflow Phases
+
+Structure the workflow in clear phases (like the examples above):
+
+```
+Phase 1: Understand/Prepare
+Phase 2: Execute Main Work
+Phase 3: Validate/Verify
+Phase 4: Report Results
+```
+
+This makes the workflow predictable and easy to follow.
+
+### Rules and Constraints
+
+Be explicit about what the agent can and can't do:
+
+**✅ Clear constraints:**
+```
+- Never approve builds with test failures
+- Never deploy without human approval
+- Always provide specific error details
+```
+
+**❌ Vague constraints:**
+```
+- Do the right thing
+- Be reasonable
+- Act professionally
+```
+
+### Output Format
+
+Define exactly how the agent should report results:
+
+**✅ Specific format:**
+```
+## Report Format
+- Section headers explain what was done
+- Status (✅/🔴/⚠️) makes results scannable
+- Specific numbers and details (not "many failures")
+- Clear verdict at the end
+```
+
+**❌ Vague reporting:**
+```
+Just explain what happened in your own words.
+```
+
+## Composing Agents (Advanced)
+
+You can create agents that **use** other agents:
+
+```markdown
+# Integration Agent
+
+## Role
+You orchestrate the full development workflow: planning, coding, reviewing, and testing.
+
+## Sub-Agents
+- Task Planner: Break down requirements
+- Code Generator: Implement tasks
+- Code Reviewer: Review code quality
+- QA Acceptance: Validate builds
+
+## Workflow
+1. Use Task Planner to break down the requirement
+2. Use Code Generator to implement each task
+3. Use Code Reviewer to review each completed task
+4. Use QA Acceptance to validate before merge
+5. Report overall status and recommendations
+```
+
+This lets you create higher-level orchestration without duplicating agent logic.
+
+## Custom Agent Checklist
+
+Before deploying a custom agent, verify:
+
+- [ ] **Role is clear** — One sentence explaining what this agent does
+- [ ] **Instruction files referenced** — Links to standards it follows
+- [ ] **Workflow documented** — Step-by-step process with clear phases
+- [ ] **Rules are explicit** — What can/can't it do
+- [ ] **Output format defined** — How it reports results
+- [ ] **Documentation written** — MDX file explaining the agent to users
+- [ ] **Indexed** — Added to agents/index.mdx
+- [ ] **Configured** — Added to ai/config.yml (if needed)
+- [ ] **Tested** — Run through a real scenario end-to-end
+
+## Common Mistakes
+
+### Mistake 1: Mixing Multiple Agents
+
+❌ **Don't do this:**
+```
+# SuperAgent
+
+## Role
+You plan tasks, generate code, review code, run tests, handle deployment, and fix bugs.
+```
+
+✅ **Do this instead:**
+Create separate agents for separate concerns, then compose them if needed.
+
+### Mistake 2: Vague Instructions
+
+❌ **Don't do this:**
+```
+## Rules
+- Be thorough
+- Do quality work
+- Follow best practices
+```
+
+✅ **Do this instead:**
+```
+## Rules
+- Never approve builds with >5 test failures
+- Always provide specific error messages (include line numbers)
+- Fail for security issues (injection, hardcoded secrets, etc.)
+```
+
+### Mistake 3: Unclear Output
+
+❌ **Don't do this:**
+```
+Just tell the user if it works or not.
+```
+
+✅ **Do this instead:**
+```
+## Output Format
+
+**Verdict**: [✅ Pass / ⚠️ Pass with warnings / ❌ Fail]
+
+**Details**:
+- [Specific finding with location/context]
+
+**Remediation**:
+- [How to fix if there are failures]
+```
+
+### Mistake 4: Missing Dependencies
+
+❌ **Don't do this:**
+```
+This agent needs the api-security.instructions.md file but doesn't mention it.
+```
+
+✅ **Do this instead:**
+```
+## Instruction Files
+- security.instructions.md
+- api-security.instructions.md ← Custom instruction for API-specific rules
+- architecture.instructions.md
+```
+
+## Examples From Other Teams
+
+### Mobile QA Agent
+```
+Role: Validate iOS and Android builds
+Workflow: Automated tests → Device farm testing → Visual inspection → Approval
+Output: Per-device test report with screenshots, crashes, performance metrics
+```
+
+### Infrastructure Agent
+```
+Role: Manage cloud resource provisioning
+Workflow: Parse infrastructure request → Create IaC → Validate with policies → Apply changes
+Output: URLs to created resources, cost estimate, integration details
+```
+
+### Data Pipeline Agent
+```
+Role: Create and validate data pipelines
+Workflow: Understand data shape → Create ETL logic → Test with sample data → Monitor pipeline
+Output: Pipeline DAG diagram, test results, data quality scores
+```
+
+## Tips for Success
+
+### Start Small
+- Create a custom agent for something simple (not mission-critical)
+- Refine based on real usage
+- Expand from there
+
+### Document Everything
+- Keep the instruction files up to date
+- Document the agent clearly
+- Include examples of what good output looks like
+
+### Get Team Buy-In
+- Share the agent definition with your team
+- Get feedback before finalizing
+- Use it for a few real tasks before declaring it "done"
+
+### Monitor and Improve
+- Collect feedback from team members using the agent
+- Update the agent based on what you learn
+- Keep instruction files aligned with actual standards
+
+## See Also
+
+- **[Agents Overview](/docs/agents)** — Understand the agent model
+- **[Code Generator](/docs/agents/code-generator)** — Reference implementation
+- **[Architecture Instructions](/docs/instructions/architecture)** — Guide to instruction files
+- **[Configuration Reference](/docs/configuration/config-reference)** — How to configure agents

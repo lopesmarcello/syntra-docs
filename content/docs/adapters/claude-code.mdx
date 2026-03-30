@@ -1,11 +1,53 @@
 ---
 title: Claude Code
-description: Claude Code adapter details and configuration.
+description: Claude Code adapter outputs, config toggles, and sync behavior.
 section: adapters
 ---
 
 ## Claude Code
 
-Claude Code adapter details and configuration.
+The Claude adapter transforms Syntra's canonical `ai/` content into a Claude Code-ready configuration file.
 
-> Content coming soon.
+## Generated files
+
+When Claude sync runs, Syntra writes:
+
+- `.claude/CLAUDE.md`
+
+This generated file aggregates your Syntra instructions and agent guidance in Claude's expected location.
+
+## Configuration
+
+Claude behavior is controlled in `ai/config.yml`:
+
+```yaml
+adapters:
+	claude:
+		enabled: false
+		instructionsMode: concatenated
+```
+
+| Key | Effect |
+|---|---|
+| `enabled` | If `true`, Claude output is included in default `syntra sync` |
+| `instructionsMode` | Chooses instruction assembly strategy (`concatenated` or `individual`) before generation |
+
+This project currently sets `adapters.claude.enabled: false`, so plain `syntra sync` skips `.claude/` output.
+
+## Sync behavior
+
+Use:
+
+```bash
+syntra sync --claude
+```
+
+or enable Claude and run:
+
+```bash
+syntra sync
+```
+
+<Callout variant="warning" title="Treat .claude output as generated">
+	`.claude/CLAUDE.md` is generated artifact output. Edit `ai/` sources instead of editing this file directly.
+</Callout>

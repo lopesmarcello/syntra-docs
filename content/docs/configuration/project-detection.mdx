@@ -1,11 +1,97 @@
 ---
 title: Project Detection
-description: How Syntra auto-detects your project type and settings.
+description: How syntra init auto-detects your project type and how to override the results.
 section: configuration
 ---
 
 ## Project Detection
 
-How Syntra auto-detects your project type and settings.
+When you run `syntra init`, Syntra scans your project files to populate the `project` section of `ai/config.yml` automatically. You rarely need to set these values by hand, but understanding what is detected — and how to correct it — saves time when detection produces unexpected results.
 
-> Content coming soon.
+## What gets detected
+
+`syntra init` inspects your project files and populates the following `project` keys:
+
+| Key | What Syntra looks for |
+|---|---|
+| `name` | Project or directory name |
+| `language` | Primary programming language inferred from file types and configuration files (e.g. `tsconfig.json` for TypeScript) |
+| `framework` | Framework detected from project dependencies and configuration (e.g. `next.js`, `express`) |
+| `packageManager` | Package manager inferred from lock files (`package-lock.json` → `npm`, `yarn.lock` → `yarn`, `pnpm-lock.yaml` → `pnpm`) |
+| `monorepo` | Whether the project is a monorepo, detected from workspace configuration |
+
+The detected values are written directly into `ai/config.yml` when init completes.
+
+## Example output
+
+After running `syntra init` in a TypeScript Next.js project managed with npm, the `project` section might look like:
+
+```yaml
+project:
+  name: my-app
+  language: typescript
+  framework: next.js
+  packageManager: npm
+  monorepo: false
+```
+
+## Overriding detected values
+
+Detection is best-effort. If the detected values are incorrect or incomplete, edit `ai/config.yml` directly:
+
+```yaml
+project:
+  name: my-app
+  language: typescript       # change if wrong
+  framework: next.js         # change if wrong
+  packageManager: pnpm       # change if wrong
+  monorepo: true             # set to true for monorepos
+```
+
+After saving, run `syntra sync` to propagate the updated project metadata into adapter output files:
+
+```bash
+syntra sync
+```
+
+Run `syntra validate` to confirm the updated config is still well-formed:
+
+```bash
+syntra validate
+```
+
+<Callout variant="info">
+  The `project` section is metadata only — it does not control which adapters or instructions are active. Adapter settings live in the [`adapters`](/docs/configuration/config-reference#adapters) section.
+</Callout>
+
+## Troubleshooting detection mismatches
+
+**Wrong language detected**
+
+Syntra may pick up a secondary language if your project contains a mix of file types. Set `language` to the primary language used in your codebase.
+
+**Framework not detected**
+
+If the framework is missing or incorrect, check that the relevant package (e.g. `next`, `express`) is listed in your `package.json` dependencies. Then set `framework` manually in `ai/config.yml`.
+
+**Package manager listed as `npm` but you use `pnpm`**
+
+Ensure `pnpm-lock.yaml` exists at the project root. If the file is absent (e.g. first install has not run yet), Syntra defaults to `npm`. Update the value manually after the lock file is created.
+
+**`monorepo: false` on a monorepo**
+
+Ensure your workspace configuration file is present at the project root before running `syntra init`, or set `monorepo: true` manually.
+
+## Re-running detection
+
+There is no `syntra detect` command. To re-run detection, run `syntra init` again in the same directory. Syntra will re-scan the project and overwrite the `project` section of `ai/config.yml` with fresh results.
+
+<Callout variant="warning" title="Init overwrites ai/config.yml">
+  Running `syntra init` a second time will overwrite your existing `ai/config.yml`. Back up any manual customisations before re-running.
+</Callout>
+
+## Related pages
+
+- [syntra init](/docs/commands/init) — full reference for the init wizard.
+- [Config Reference](/docs/configuration/config-reference#project) — complete field documentation for the `project` section.
+- [Configuration Overview](/docs/configuration) — how `project` fits within the full `ai/config.yml` structure.

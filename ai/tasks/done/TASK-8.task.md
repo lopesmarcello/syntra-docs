@@ -1,0 +1,30 @@
+# TASK-8: Author Agents Section Content
+
+## Context
+All agent section pages are currently placeholders. This task documents the agent model and each built-in agent so teams can select, use, and customize agents with accurate expectations.
+
+## References
+- **Agent**: [code-generator](../agents/code-generator.agent.md)
+- **Instructions**:
+  - [architecture](../instructions/architecture.instructions.md)
+  - [style](../instructions/style.instructions.md)
+
+## Dependencies
+TASK-3
+
+## Steps
+1. [ ] Use `ai/tasks/active/TASK-3-audit.md` to confirm scope for `content/docs/agents/{index,code-generator,bug-fixer,code-reviewer,task-planner,custom}.mdx`.
+2. [ ] Replace placeholders in all six agents pages with complete content based on the corresponding files in `ai/agents/`.
+3. [ ] Ensure each agent page captures role, workflow, guardrails, and output/reporting expectations.
+4. [ ] For `agents/custom.mdx`, document how to design custom agents by following built-in patterns (instruction references, scope limits, output format).
+5. [ ] Ensure the `agents/index.mdx` page provides selection guidance and links cleanly to each agent profile.
+
+## Acceptance Criteria
+- [ ] All six placeholder pages in `agents/` are fully authored.
+- [ ] Each built-in agent page accurately reflects its source file behavior and constraints.
+- [ ] Custom agent guidance is practical and consistent with existing agent conventions.
+- [ ] Cross-links between index and per-agent pages are valid.
+- [ ] No placeholder text remains in the agents section.
+
+## Notes
+- Primary sources: `ai/agents/{code-generator,bug-fixer,code-reviewer,task-planner}.agent.md`, plus supporting instruction files those agents reference.

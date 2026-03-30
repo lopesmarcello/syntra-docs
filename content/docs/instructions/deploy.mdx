@@ -1,11 +1,59 @@
 ---
 title: Deploy Instructions
-description: Deploy instruction template reference.
+description: Define release workflow, CI/CD expectations, and deployment guardrails for agents.
 section: instructions
 ---
 
 ## Deploy Instructions
 
-Deploy instruction template reference.
+Deploy instructions describe how code moves from branch to production. They give agents clear boundaries for branch naming, commit formatting, CI expectations, environment handling, and release-safe behavior.
 
-> Content coming soon.
+Source file: `ai/instructions/deploy.instructions.md`
+
+## Purpose
+
+Use deployment instructions to standardize collaboration and release quality across contributors and agents.
+
+This module is especially important when:
+
+- Multiple engineers and agents contribute to the same repository
+- Pull requests must satisfy specific CI checks
+- Branch and commit naming are enforced by policy
+- Environment variable handling must stay consistent across environments
+
+## Key sections
+
+The built-in deploy module currently covers:
+
+- **Branch Strategy** — `main`, `develop`, and feature/bugfix naming patterns.
+- **Commit Conventions** — Conventional Commit format (`type(scope): description`).
+- **CI Pipeline** — baseline expectation that CI checks pass on each PR.
+- **Environment Constraints** — runtime constraints (Edge, Server Components, serverless limits, bundle size).
+- **Environment Variables** — `.env.example` update and secret-management process.
+- **Build & Output** — standard commands (`npm run build`, `npm run lint`, `npm test`, etc.).
+- **AI Agent Rules** — guardrails such as avoiding direct CI workflow edits unless explicitly required.
+
+## When to customize
+
+Customize deploy instructions when:
+
+- Your team uses a different branch model
+- Commit scopes/types differ from the built-in list
+- CI includes additional required checks (security scan, snapshots, contract tests)
+- Deployment strategy changes (for example feature environments, canary, or trunk-based)
+
+Keep this file focused on policy and process. Implementation details for one feature belong in tasks, not deploy instructions.
+
+## Authoring tips
+
+- Keep branch and commit examples realistic and copy-pastable.
+- List mandatory CI checks explicitly if your team enforces them.
+- Document environment-variable workflow once here, then reference it in tasks instead of repeating instructions.
+- Update this file before introducing new release gates, so agent behavior remains predictable.
+
+## Related pages
+
+- [Architecture Instructions](/docs/instructions/architecture)
+- [Security Instructions](/docs/instructions/security)
+- [Custom Instructions](/docs/instructions/custom)
+

@@ -1,11 +1,51 @@
 ---
 title: Adapters
-description: What adapters are and the single source of truth concept.
+description: How adapters map canonical ai/ files to tool-specific outputs.
 section: adapters
 ---
 
 ## Adapters
 
-What adapters are and the single source of truth concept.
+Adapters are Syntra's translation layer between your canonical `ai/` source files and each AI coding tool's expected format.
 
-> Content coming soon.
+## Source of truth
+
+Syntra uses one rule everywhere: **edit files in `ai/`, then generate adapter output with `syntra sync`**.
+
+- Canonical source: `ai/config.yml`, `ai/instructions/*.instructions.md`, `ai/agents/*.agent.md`, `ai/skills/*.skill.md`, and `ai/tasks/*/*.task.md`
+- Generated output: `.github/`, `.claude/`, and `.cursor/`
+
+<Callout variant="warning" title="Generated files are disposable">
+	Adapter output files are regenerated and overwritten by `syntra sync`. Avoid manual edits in `.github/`, `.claude/`, or `.cursor/`.
+</Callout>
+
+## Built-in adapters
+
+| Adapter | Key in `ai/config.yml` | Generated targets |
+|---|---|---|
+| GitHub Copilot | `adapters.copilot` | `.github/copilot-instructions.md`, `.github/agents/*.md` |
+| Claude Code | `adapters.claude` | `.claude/CLAUDE.md` |
+| Cursor | `adapters.cursor` | `.cursor/rules/*.mdc` |
+
+## Config toggles
+
+Each adapter supports the same two controls:
+
+- `enabled`: include or skip that adapter during sync
+- `instructionsMode`: choose instruction rendering strategy (`concatenated` or `individual`)
+
+When you run `syntra sync` without a flag, Syntra generates output for **all enabled adapters**.
+
+```bash
+syntra sync
+```
+
+To sync one target only, use adapter flags:
+
+```bash
+syntra sync --copilot
+syntra sync --claude
+syntra sync --cursor
+```
+
+In this project, only Copilot is enabled in `ai/config.yml`, so default sync updates files under `.github/`.

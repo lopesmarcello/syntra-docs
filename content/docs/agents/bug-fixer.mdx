@@ -1,11 +1,324 @@
 ---
 title: Bug Fixer
-description: The bug fixer agent reference.
+description: How the bug fixer agent diagnoses and fixes bugs.
 section: agents
 ---
 
 ## Bug Fixer
 
-The bug fixer agent reference.
+The bug fixer agent diagnoses root causes methodically before fixing anything. It confirms the diagnosis with you, implements a minimal fix with a regression test, and never touches anything beyond the reported bug.
 
-> Content coming soon.
+## When to Use Bug Fixer
+
+Use bug fixer when:
+- ✅ You have a bug report with reproduction steps
+- ✅ You need to understand what's wrong before fixing it
+- ✅ You want to prevent regression with a test
+- ✅ You need a minimal fix without scope creep
+
+**Don't use bug fixer when:**
+- ❌ You already know the exact root cause — use [Code Generator](/docs/agents/code-generator) instead
+- ❌ The issue is unclear or missing reproduction steps — ask for more details first
+- ❌ You want a refactor of the affected code — do that separately after the fix
+
+## How Bug Fixer Works
+
+Bug fixer follows a strict two-phase process: **Diagnose**, then **Fix**.
+
+### Phase 1: Diagnose (BEFORE Writing Any Code)
+
+#### Step 1: Understand the Report
+
+Bug fixer first clarifies what's happening:
+
+- **What is the expected behavior?** — What should happen in normal usage?
+- **What is the actual behavior?** — What's happening instead?
+- **What are the reproduction steps?** — Exactly how do you trigger the bug?
+
+If any of these are missing, **bug fixer stops and asks** for clarification.
+
+#### Step 2: Locate the Problem
+
+Bug fixer methodically traces the issue:
+
+1. Starts from the symptom and works backward
+2. Searches for the function/component mentioned in the bug report
+3. Reads the code and its dependencies
+4. Checks recent changes to affected files (if available)
+5. Looks at existing tests — are they passing? Do they cover this case?
+
+#### Step 3: Identify the Root Cause
+
+Bug fixer doesn't stop at the first suspicious code. It verifies:
+
+- **Is this a logic error?** — Wrong calculation, wrong condition, incorrect algorithm?
+- **Is this a missing edge case?** — Null check, empty input, boundary condition?
+- **Is this a wrong assumption?** — Data type mismatch, timing issue, API misuse?
+- **Is this a missing validation?** — User input not checked before use?
+
+The diagnosis must explain the exact symptom described in the bug report.
+
+#### Step 4: Report Your Diagnosis
+
+Before writing any code, bug fixer presents findings:
+
+```markdown
+## Bug Diagnosis
+
+**Symptom**: [What's happening — from the bug report]
+
+**Root cause**: [What's actually wrong in the code and why]
+
+**Location**: `path/to/file.ts` → `functionName` (line reference if possible)
+
+**Evidence**: [How you confirmed this is the cause]
+
+**Proposed fix**: [Brief description of the minimal change needed]
+
+**Risk assessment**: [What else could this fix affect? Low/Medium/High]
+
+**Waiting for approval before implementing.**
+```
+
+### Example Diagnosis
+
+```markdown
+## Bug Diagnosis
+
+**Symptom**: LoginForm crashes when email field is left empty and user submits
+
+**Root cause**: The `validateEmail()` function doesn't check for empty strings before 
+calling `email.includes('@')`. When the field is empty, the string length is 0, and 
+accessing any position triggers the crash.
+
+**Location**: `components/LoginForm.tsx` → `validateEmail()` (line 45)
+
+**Evidence**: Traced the error stack → validateEmail is called on submit → reproduces 
+with empty field → the function has no empty string check unlike `validatePassword()` 
+which does (line 48)
+
+**Proposed fix**: Add empty string check at the start of `validateEmail()` 
+(return false if email.trim() === '')
+
+**Risk assessment**: Low — only affects email validation, no other code calls this 
+function directly, and we have existing tests to verify the fix doesn't break valid emails
+
+**Waiting for approval before implementing.**
+```
+
+You review this diagnosis and confirm it's correct before bug fixer proceeds.
+
+### Phase 2: Fix (AFTER You Approve the Diagnosis)
+
+Once you approve the diagnosis, bug fixer implements the fix using this approach:
+
+#### Step 1: Write the Regression Test First
+
+Bug fixer writes a test that reproduces the bug **before** implementing the fix:
+
+- The test should **fail** with the current code
+- This proves the bug is real
+- The test catches the bug if it recurs in the future
+
+```typescript
+it('returns false for empty email string', () => {
+  expect(validateEmail('')).toBe(false);
+});
+```
+
+#### Step 2: Implement the Minimal Fix
+
+Bug fixer changes **only** what's necessary to fix the root cause:
+
+✅ Fix the bug (and only the bug)
+❌ Do NOT refactor surrounding code
+❌ Do NOT rename variables or functions
+❌ Do NOT reorganize or reformat unrelated code
+❌ Do NOT fix other bugs you notice
+
+If the code around the bug is messy, **leave it as-is** in this fix. Clean it up in a separate refactor task later.
+
+#### Step 3: Verify
+
+Bug fixer verifies:
+- ✅ The new regression test now passes
+- ✅ All existing tests still pass (no regression)
+- ✅ The fix addresses the exact symptom described in the bug report
+
+#### Step 4: Report the Fix
+
+```markdown
+## Bug Fix Applied
+
+**Files changed:**
+- `path/to/file.ts` — [what was changed]
+- `path/to/file.test.ts` — [regression test added]
+
+**What was fixed:**
+[1-2 sentence summary]
+
+**Regression test:**
+[Describe what the new test verifies]
+
+**Waiting for review.**
+```
+
+### Example Complete Fix
+
+```markdown
+## Bug Fix Applied
+
+**Files changed:**
+- `components/LoginForm.tsx` — Added null/empty check to `validateEmail()`
+- `components/LoginForm.test.tsx` — Added regression test for empty email
+
+**What was fixed:**
+LoginForm no longer crashes when email field is empty. Added early return in 
+`validateEmail()` that returns false for empty strings before attempting string operations.
+
+**Regression test:**
+```typescript
+it('returns false for empty email string', () => {
+  expect(validateEmail('')).toBe(false);
+});
+
+it('returns false for whitespace-only email', () => {
+  expect(validateEmail('   ')).toBe(false);
+});
+```
+
+**Waiting for review.**
+```
+
+## Rules
+
+### The Minimal Fix Principle
+
+Always apply the minimal fix principle:
+
+✅ Fix the bug, nothing else
+✅ Change the least amount of code necessary
+✅ If the code is messy, document it but don't clean it
+✅ If you find other bugs nearby, report them separately
+
+❌ Do NOT refactor while fixing
+❌ Do NOT add features
+❌ Do NOT fix other bugs
+❌ Do NOT reorganize or reformat
+
+### Example: Minimal Fix vs Refactor
+
+**Task**: Fix crash when email field is empty
+
+**Minimal Fix (Correct):**
+```typescript
+export function validateEmail(email: string): boolean {
+  if (!email || email.trim() === '') return false;
+  
+  return email.includes('@') && email.includes('.');
+}
+```
+
+**Not Allowed (Over-scope):**
+```typescript
+export function validateEmail(email: string): boolean {
+  // This refactors the function, which is out of scope
+  const trimmed = email.trim();
+  const hasAt = trimmed.includes('@');
+  const hasDot = trimmed.includes('.');
+  
+  return !trimmed.length === 0 && hasAt && hasDot;
+}
+```
+
+### Mandatory Regression Test
+
+Every bug fix **must** include a regression test. No exceptions.
+
+The regression test:
+- ✅ Reproduces the exact bug that was reported
+- ✅ Fails with the original code
+- ✅ Passes after the fix
+- ✅ Is specific to this bug (not a broad integration test)
+- ✅ Will catch the bug if it recurs
+
+If an area seems untestable, bug fixer still attempts a test and documents any limitations.
+
+### When Bug Fixer Can't Find the Cause
+
+If bug fixer can't find the root cause after thorough investigation:
+
+1. **Reports what was checked** — Which files, functions, and tests were examined
+2. **Explains what wasn't found** — What evidence would point to the cause
+3. **Recommends next steps** — Additional information needed, or areas that need more investigation
+4. **Asks for help** — Requests clarification from you or other team members
+
+Bug fixer never guesses at a fix without confirming the root cause first.
+
+## Instruction Compliance
+
+Bug fixer reads these instructions:
+
+| Instruction | Why |
+|---|---|
+| **architecture.instructions.md** | To understand project structure when searching for the bug |
+| **testing.instructions.md** | To write proper regression tests that match your test conventions |
+| **style.instructions.md** | To ensure the fix matches your code style and patterns |
+
+## Workflow Example
+
+Here's a complete bug fix workflow:
+
+```
+1. You report: "LoginForm crashes when email is empty"
+   ↓
+2. Bug Fixer diagnoses:
+   - Traces the crash to validateEmail()
+   - Finds missing empty check
+   - Presents diagnosis for approval
+   ↓
+3. You review and approve the diagnosis
+   ↓
+4. Bug Fixer writes regression test (fails with current code)
+   ↓
+5. Bug Fixer implements minimal fix
+   ↓
+6. Bug Fixer verifies: regression test passes, all other tests pass
+   ↓
+7. Reports the fix, waits for final review
+   ↓
+8. You review and approve
+   ↓
+9. Fix is ready to merge
+```
+
+## Tips for Working With Bug Fixer
+
+### Provide Clear Bug Reports
+- Explain the expected behavior
+- Describe the actual behavior
+- Include exact reproduction steps
+- Mention when the bug started (recent commits, specific feature)
+
+### Review the Diagnosis Carefully
+- Make sure the root cause explanation makes sense
+- Ask for clarification if needed
+- Approve before bug fixer implements the fix
+- This is your chance to catch misunderstandings early
+
+### Accept Minimal Fixes
+- A minimal fix now beats a perfect fix later
+- Code cleanup and refactoring can be separate tasks
+- This keeps the scope focused and changesets reviewable
+
+### Write Good Tests
+- Keep your testing standards clear in `testing.instructions.md`
+- Make sure test names describe what they verify
+- The regression test should be a keeper — add it to your test suite
+
+## See Also
+
+- **[Agents Overview](/docs/agents)** — Understand the agent model
+- **[Code Generator](/docs/agents/code-generator)** — Implementation tasks
+- **[Code Reviewer](/docs/agents/code-reviewer)** — Review quality gates
+- **[Testing Instructions](/docs/instructions/testing)** — Test conventions

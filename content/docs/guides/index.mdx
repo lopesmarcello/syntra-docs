@@ -8,4 +8,22 @@ section: guides
 
 Practical guides for using Syntra effectively.
 
-> Content coming soon.
+## Recommended reading path
+
+Use these guides in order if you're onboarding a new project or team:
+
+1. [First Project](/docs/guides/first-project) — run Syntra end-to-end in an existing repository.
+2. [Writing Tasks](/docs/guides/writing-tasks) — create high-quality `.task.md` files that agents can execute reliably.
+3. [Team Workflow](/docs/guides/team-workflow) — standardize your day-to-day development loop.
+4. [Migrating](/docs/guides/migrating) — move from manual adapter edits to canonical `ai/` workflows.
+
+## What these guides optimize for
+
+- **Consistent execution**: every team member follows the same task lifecycle.
+- **Low drift**: all adapter output is regenerated from canonical `ai/` files.
+- **Reviewable changes**: tasks and acceptance criteria are explicit and verifiable.
+- **Safer scaling**: standards in instructions and agents remain reusable across projects.
+
+<Callout variant="info" title="Source of truth reminder">
+	Edit files in `ai/` first, then run `syntra sync`. Treat adapter output files as generated artifacts.
+</Callout>

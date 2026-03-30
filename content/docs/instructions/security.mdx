@@ -1,11 +1,61 @@
 ---
 title: Security Instructions
-description: Security instruction template reference.
+description: Define secure coding defaults for input handling, secrets, auth patterns, and dependencies.
 section: instructions
 ---
 
 ## Security Instructions
 
-Security instruction template reference.
+Security instructions define non-negotiable safety rules for code generation and review. They reduce risk by enforcing secure defaults at the boundaries where vulnerabilities commonly appear.
 
-> Content coming soon.
+Source file: `ai/instructions/security.instructions.md`
+
+## Purpose
+
+Use this module to codify secure development practices that agents can enforce consistently in every task.
+
+The security file should answer:
+
+- How secrets are stored and referenced
+- How external input is validated
+- How output is safely encoded
+- How data access avoids injection risks
+- Which authentication and dependency patterns are allowed
+
+## Key sections
+
+The built-in security module currently includes:
+
+- **Secrets & Environment Variables** — no hardcoded secrets, `.env` handling, safe logging.
+- **Input Validation** — validate at boundaries, whitelist values, reject unexpected fields.
+- **Output Encoding** — avoid unsafe HTML injection and unsafe URL protocols.
+- **Database Queries** — parameterized queries/ORM only.
+- **Authentication Patterns** — no custom crypto, safe token/session handling.
+- **Sensitive Data in Code** — PII/logging constraints.
+- **Dependency Security** — package quality expectations for security-critical libraries.
+- **AI Agent Rules** — mandatory security checks during generation and review.
+
+## When to customize
+
+Customize security instructions when:
+
+- Your organization has compliance requirements (for example SOC2, HIPAA, PCI)
+- Your auth/session model has strict internal standards
+- You require approved validation/sanitization libraries
+- You need explicit logging/redaction policies by environment
+
+Keep rules actionable and verifiable. Prefer concrete allowed/forbidden patterns over broad statements.
+
+## Authoring tips
+
+- Treat this file as policy, not a tutorial.
+- Provide short code examples only when they clarify a rule.
+- Keep framework-specific constraints aligned with your architecture and style files.
+- Revisit this file whenever threat model, auth flow, or data classification changes.
+
+## Related pages
+
+- [Testing Instructions](/docs/instructions/testing)
+- [Deploy Instructions](/docs/instructions/deploy)
+- [Custom Instructions](/docs/instructions/custom)
+

@@ -34,6 +34,9 @@ This is useful when you only want to update one tool's configuration without tou
 
 Running `syntra sync` with no flag generates output for all enabled adapters as configured in `ai/config.yml`.
 
+In this project, `ai/config.yml` currently enables GitHub Copilot only, so a plain `syntra sync`
+refreshes the files under `.github/`.
+
 <Callout variant="warning" title="Adapter output is overwritten">
   `syntra sync` always overwrites adapter output files. Do not edit files inside `.github/`, `.claude/`, or `.cursor/` directly — changes will be lost on the next sync.
 </Callout>

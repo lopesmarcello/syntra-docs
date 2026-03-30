@@ -1,11 +1,152 @@
 ---
 title: Agents
-description: What agents are and how they work in Syntra.
+description: Understand Syntra's agent-based workflow and how to choose the right agent for your task.
 section: agents
 ---
 
 ## Agents
 
-What agents are and how they work in Syntra.
+Syntra uses **agents** to automate different phases of software development. Each agent has a specific role, clear boundaries, and a defined workflow. This guide helps you understand what agents do and how to use them.
 
-> Content coming soon.
+## Agent Model
+
+An agent is an AI assistant specialized for one part of the development lifecycle:
+
+- **Agents are specialized**, not general-purpose — each has one clear responsibility
+- **Agents follow instruction files** — they read project architecture, style, security, and testing guidelines before acting
+- **Agents work in sequence** — output from one agent feeds into the next (e.g., task-planner → code-generator → code-reviewer)
+- **Agents report clearly** — they explain what they did, why, and what needs human review
+- **Agents respect scope discipline** — they only change what's asked for, never refactor unrelated code
+
+## Built-In Agents
+
+### [Code Generator](/docs/agents/code-generator)
+**When**: You have a task and need implementation.
+
+**What it does**: Implements tasks step by step, following all project instructions. Writes code, tests, and configuration changes while waiting for human review between steps.
+
+**Specialties**: Converting concrete steps into working code, following existing patterns, building tests alongside implementation.
+
+### [Bug Fixer](/docs/agents/bug-fixer)
+**When**: You have a bug to fix.
+
+**What it does**: Diagnoses the root cause first, confirms it with you, then implements a minimal fix with a regression test. Never fixes anything beyond the reported bug.
+
+**Specialties**: Root cause analysis, test-driven fixing, avoiding scope creep.
+
+### [Code Reviewer](/docs/agents/code-reviewer)
+**When**: You need to review code changes before merging.
+
+**What it does**: Reviews code against project instructions and task requirements. Checks correctness, security, architecture, tests, and style in that order, with severity levels for feedback.
+
+**Specialties**: Enforcing quality gates, catching security issues, constructive feedback backed by project guidelines.
+
+### [Task Planner](/docs/agents/task-planner)
+**When**: You have a vague request or feature idea that needs to be broken down.
+
+**What it does**: Converts feature requests, bug reports, and requirements into structured `.task.md` files that code-generator can execute. Creates clear steps and acceptance criteria.
+
+**Specialties**: Decomposing complex work, identifying dependencies, writing reviewable steps.
+
+## Workflow Example
+
+Here's a typical workflow using multiple agents:
+
+```
+1. You: "We need password reset functionality"
+   ↓
+2. Task Planner: Breaks it into tasks:
+   - Task 1: Create password reset email template
+   - Task 2: Implement password reset request endpoint
+   - Task 3: Implement password reset flow in UI
+   ↓
+3. Code Generator: Implements each task step by step, with review between steps
+   ↓
+4. You: Review each task implementation
+   ↓
+5. Code Reviewer: Reviews the code changes against all project instructions
+   ↓
+6. Code Generator: Fixes any issues found by reviewer
+   ↓
+7. You: Approve and merge
+```
+
+## Choosing an Agent
+
+| Your Situation | Agent | Why |
+|---|---|---|
+| "I know exactly what to build and have clear steps" | Code Generator | Ready for implementation, minimize planning overhead |
+| "Something is broken and I need to fix it" | Bug Fixer | Handles diagnosis before fix, ensures regression tests |
+| "I need someone to review these changes" | Code Reviewer | Enforces quality gates and catches issues early |
+| "I have an idea but it's not broken down yet" | Task Planner | Converts vague requirements into executable tasks |
+| "I need a custom agent for our team's workflow" | [Custom Agents](/docs/agents/custom) | Learn to extend Syntra with domain-specific agents |
+
+## Agent Execution Model
+
+All built-in agents follow strict patterns:
+
+### Read Instructions First
+Before working on any task, agents read:
+- **architecture.instructions.md** — Where code goes, how modules are organized, naming conventions
+- **style.instructions.md** — Formatting, code patterns, component structure
+- **testing.instructions.md** — Test conventions and coverage expectations
+- **security.instructions.md** — Input validation, secrets, safe patterns
+
+Tasks may reference additional instruction files, which agents read too.
+
+### Execute, Report, Wait
+Agents execute work in cycles:
+1. **Announce** what they're about to do
+2. **Execute** the work
+3. **Report** what changed and why
+4. **Wait** for human review before proceeding
+
+This keeps you in control and lets you catch issues early.
+
+### Scope Discipline
+Agents **never**:
+- Refactor code outside the task scope
+- Add features not requested
+- Update dependencies without explicit approval
+- Modify config files unless required by the task
+- Fix other bugs they notice (they report them instead)
+
+If agents notice something that should be fixed but is out of scope, they mention it in their report but don't change it.
+
+## Key Concepts
+
+### Instruction Files
+These files define how your project should be built:
+- **architecture.instructions.md** — Project structure, module organization, naming
+- **style.instructions.md** — Code style, formatting, patterns, conventions
+- **testing.instructions.md** — What to test, how to test, test structure
+- **security.instructions.md** — Input validation, secrets, safe patterns
+- **deploy.instructions.md** — Deployment process, CI/CD, environment setup
+
+Agents read these before acting. Keep them up to date — they're the source of truth for code quality.
+
+### Output Reporting
+When agents complete work, they report:
+- **Files changed** — What was created, modified, or deleted
+- **What was done** — 2-3 sentence summary of the implementation
+- **Key decisions** — Non-obvious choices and why they were made
+- **Review status** — Whether they're waiting for approval before the next step
+
+This reporting keeps you informed and makes it easy to spot issues.
+
+### Review Checkpoints
+Agents create natural review points:
+- Code Generator waits between steps
+- Bug Fixer waits after diagnosis and after fixes
+- Code Reviewer provides all feedback at once
+- Task Planner delivers completed task files ready for review
+
+You always have a chance to intervene before the next phase starts.
+
+## Next Steps
+
+- **[Code Generator](/docs/agents/code-generator)** — Learn how to assign implementation tasks
+- **[Bug Fixer](/docs/agents/bug-fixer)** — Learn how to diagnose and fix bugs
+- **[Code Reviewer](/docs/agents/code-reviewer)** — Learn how to review changes thoroughly
+- **[Task Planner](/docs/agents/task-planner)** — Learn how to break down requirements
+- **[Custom Agents](/docs/agents/custom)** — Extend Syntra with your own agents

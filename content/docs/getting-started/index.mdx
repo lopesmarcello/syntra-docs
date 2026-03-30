@@ -8,4 +8,42 @@ section: getting-started
 
 Syntra is a CLI tool that brings structure and consistency to your AI-assisted development workflow. It acts as a single source of truth for your instructions, agents, tasks, and skills — then syncs them to whichever AI coding tools your team uses.
 
-> Content coming soon.
+## Who it is for
+
+Syntra is built for engineering teams that want reliable, repeatable AI-assisted delivery:
+
+- Individual developers who want a clear workflow for AI-driven tasks.
+- Team leads who need consistent standards across multiple contributors.
+- Teams using one or more coding tools (GitHub Copilot, Claude Code, Cursor) and wanting shared behavior.
+
+If you already use Markdown-based engineering workflows and version control, Syntra fits naturally into your existing process.
+
+## The source-of-truth model
+
+Syntra follows one core rule: **edit `ai/`, generate everything else**.
+
+- You define instructions, agents, skills, and tasks in `ai/`.
+- You run `syntra sync` (or `npx syntra sync`) to regenerate adapter outputs.
+- Generated files in `.github/`, `.claude/`, and `.cursor/` are treated as build artifacts.
+
+This keeps your team aligned on a single canonical workflow and avoids drift between tools.
+
+<Callout variant="warning" title="Avoid direct adapter edits">
+	Do not edit generated adapter files directly. With `sync.warnManualEdits: true` (enabled by default), Syntra warns when manual edits are detected, and `syntra sync` will overwrite those files.
+</Callout>
+
+## How onboarding flows
+
+1. Install or run Syntra with `npx`.
+2. Run `syntra init` (or `npx syntra init`) to scaffold `ai/`.
+3. Tailor your instruction files to your project.
+4. Run `syntra sync` to generate adapter files.
+5. Execute your first task and iterate.
+
+## Recommended next pages
+
+- Start with [Installation](/docs/getting-started/installation).
+- Continue to [Quick Start](/docs/getting-started/quick-start) for your first run.
+- Read [Core Concepts](/docs/getting-started/concepts) to understand instructions, agents, tasks, skills, and adapters.
+- Then review [syntra init](/docs/commands/init) and [syntra sync](/docs/commands/sync).
+- For team-level rollout, use [Team Workflow](/docs/guides/team-workflow).

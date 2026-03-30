@@ -8,4 +8,79 @@ section: guides
 
 Setting up Syntra on an existing project.
 
-> Content coming soon.
+This guide walks through your first complete execution cycle, from initialization to validation, using the same sequence as the Team Workflow guide.
+
+## Goal
+
+By the end, you will have:
+
+- canonical project guidance in `ai/instructions/`
+- at least one executable task in `ai/tasks/active/`
+- synced adapter output for your enabled tools
+- a validated, reviewable workflow your team can repeat
+
+## End-to-end setup
+
+<Steps>
+	<Step title="1) Initialize Syntra">
+		In your repository root, run:
+
+		```bash
+		npx syntra init
+		```
+
+		Choose instruction templates, agents, and adapter targets during the prompt flow.
+	</Step>
+	<Step title="2) Customize instructions">
+		Open generated files in `ai/instructions/` and adapt them to your actual project architecture, coding style, security rules, and testing expectations.
+	</Step>
+	<Step title="3) Create your first task">
+		Scaffold a task file:
+
+		```bash
+		npx syntra add task
+		```
+
+		Describe one concrete, reviewable change. Keep scope small for your first run.
+	</Step>
+	<Step title="4) Sync adapter outputs">
+		Regenerate adapter artifacts from canonical `ai/` sources:
+
+		```bash
+		npx syntra sync
+		```
+	</Step>
+	<Step title="5) Execute with your coding agent">
+		Open your AI tool and reference the task ID (for example `TASK-1`).
+	</Step>
+	<Step title="6) Mark the task done">
+		After completion, move it from active to done:
+
+		```bash
+		npx syntra done TASK-1
+		```
+	</Step>
+	<Step title="7) Validate the project">
+		Confirm config, references, task structure, and sync freshness:
+
+		```bash
+		npx syntra validate
+		```
+	</Step>
+</Steps>
+
+## First-project checklist
+
+- `ai/config.yml` exists and reflects your project/adapters.
+- `ai/instructions/*.instructions.md` are customized (not generic boilerplate).
+- Task file has required sections: Context, References, Dependencies, Steps, Acceptance Criteria, Notes.
+- `npx syntra sync` has been run after edits.
+- `npx syntra validate` exits successfully.
+
+## Common mistakes to avoid
+
+- Editing `.github/`, `.claude/`, or `.cursor/` directly instead of `ai/`.
+- Creating oversized first tasks that span unrelated modules.
+- Skipping validation before opening a pull request.
+
+For team-scale usage patterns, continue with [Team Workflow](/docs/guides/team-workflow).

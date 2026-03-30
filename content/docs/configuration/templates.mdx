@@ -1,11 +1,77 @@
 ---
 title: Templates
-description: Template system reference for Syntra.
+description: Save and reuse your ai/ setup across projects with syntra template.
 section: configuration
 ---
 
 ## Templates
 
-Template system reference for Syntra.
+Once you have dialled in your `ai/` configuration — instructions, agents, adapter settings — on one project, you can save that setup as a named template and reuse it when bootstrapping future projects. This keeps team conventions consistent across all your repositories without manual copying.
 
-> Content coming soon.
+## Saving a template
+
+Run the following inside the project whose `ai/` directory you want to preserve:
+
+```bash
+syntra template save <name>
+```
+
+For example:
+
+```bash
+syntra template save my-team-standard
+```
+
+This snapshots the current `ai/` directory (config, instructions, agents, skills, and tasks structure) and stores it in your user-level templates directory.
+
+## Listing saved templates
+
+```bash
+syntra template list
+```
+
+Prints the names of all templates you have saved. Use the listed name when starting a new project (see below).
+
+## Storage location
+
+Templates are stored at:
+
+```text
+~/.syntra/templates/
+```
+
+This is a user-level path, not project-level, so every project on the same machine can access any saved template.
+
+## Using a template when initialising a new project
+
+When you run `syntra init` in a new project, the wizard will prompt you to pick a saved template. Select the template name from the list to pre-populate the `ai/` directory from that saved configuration instead of building from scratch.
+
+<Callout variant="tip">
+  Save a template after your first project is stable — not during setup. That way the snapshot represents a proven configuration rather than a work-in-progress one.
+</Callout>
+
+## Recommended team workflow
+
+1. **First repository** — run `syntra init` interactively and tune `ai/config.yml`, instructions, and agents until the setup works well for your team.
+2. **Save** — run `syntra template save <team-name>` to capture the configuration.
+3. **New repositories** — run `syntra init` and select the saved template when prompted. Each new project starts from the shared baseline.
+4. **Evolve** — update the saved template whenever your standards change by re-running `syntra template save` with the same name.
+
+## What is included in a template
+
+A template captures the full contents of `ai/` at the time of saving:
+
+| Path | Included |
+|---|---|
+| `ai/config.yml` | Yes — all settings including adapter toggles and `instructionsMode` |
+| `ai/instructions/*.instructions.md` | Yes |
+| `ai/agents/*.agent.md` | Yes |
+| `ai/skills/*.skill.md` | Yes |
+| `ai/tasks/active/` | No — active tasks are project-specific |
+| `ai/tasks/done/` | No |
+
+## Related pages
+
+- [syntra template](/docs/commands/template) — command reference for `save` and `list`.
+- [syntra init](/docs/commands/init) — how `--template` integrates into the init workflow.
+- [Config Reference](/docs/configuration/config-reference) — full documentation of every `ai/config.yml` field.

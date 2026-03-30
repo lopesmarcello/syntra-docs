@@ -8,4 +8,114 @@ section: guides
 
 How to write effective task files for Syntra.
 
-> Content coming soon.
+High-quality tasks make execution predictable. This guide describes the exact structure, step granularity, and acceptance criteria style used by Syntra's planner conventions and existing project tasks.
+
+## Task file contract
+
+Task files live in `ai/tasks/{activeDir}/` and must use this shape:
+
+```markdown
+# TASK-<N>: <Short descriptive title>
+
+## Context
+## References
+## Dependencies
+## Steps
+## Acceptance Criteria
+## Notes
+```
+
+Use `npx syntra add task` to scaffold the file and keep naming/placement aligned with `ai/config.yml`.
+
+## Write stronger sections
+
+### Context
+
+- Explain **what** is changing, **why** it matters, and expected outcome in 2-4 sentences.
+- Mention user impact or technical risk when relevant.
+- Keep it scoped to one logical unit of work.
+
+### References
+
+- Point to the execution agent and relevant instruction files.
+- Include only references needed to complete this task.
+- Prefer project-local links (agents, instructions, related tasks/specs).
+
+### Dependencies
+
+- Use `None` when independent.
+- Use explicit task IDs when ordering matters (example: `TASK-3`).
+
+### Steps
+
+Each step should be one concrete action that is specific, ordered, and reviewable.
+
+Good patterns:
+
+- Name exact files/functions/components to create or update.
+- Separate implementation, tests, and integration into distinct steps.
+- Keep steps outcome-focused, not tool-internal.
+
+Avoid:
+
+- vague instructions like "fix issue" or "update all files"
+- bundling unrelated changes in one step
+- adding optional refactors not requested by the requirement
+
+### Acceptance Criteria
+
+Acceptance criteria must be objectively verifiable.
+
+- Include behavior outcomes (not implementation preference).
+- Include edge-case criteria where relevant.
+- Include testing expectations (new/updated tests, or explicit validation command).
+
+## Practical quality checklist
+
+Before execution, verify:
+
+- task ID uses configured prefix (default `TASK-`)
+- file is in `ai/tasks/active/` (or configured active dir)
+- all required headings exist
+- steps are concrete and can be checked in review
+- acceptance criteria map directly to requested outcomes
+
+## Annotated mini-example
+
+```markdown
+# TASK-11: Add docs sidebar collapsed-state persistence
+
+## Context
+Persist sidebar collapse state between page loads so docs navigation feels consistent.
+Store only non-sensitive UI state and keep behavior compatible with current theme handling.
+
+## References
+- **Agent**: [code-generator](../agents/code-generator.agent.md)
+- **Instructions**:
+	- [architecture](../instructions/architecture.instructions.md)
+	- [testing](../instructions/testing.instructions.md)
+
+## Dependencies
+None
+
+## Steps
+1. [ ] Add collapsed-state persistence utility in `lib/` and wire it into sidebar state initialization.
+2. [ ] Update docs sidebar components to write the new state on toggle.
+3. [ ] Add or update tests for load/save behavior and fallback defaults.
+
+## Acceptance Criteria
+- [ ] Sidebar collapse state persists after page reload.
+- [ ] Invalid stored state falls back to the default without errors.
+- [ ] Updated tests pass for persistence and fallback behavior.
+
+## Notes
+Keep this task limited to docs navigation state only.
+```
+
+After creating or editing tasks, run:
+
+```bash
+npx syntra validate
+```
+
+Then run `npx syntra sync` if your project does not auto-sync.

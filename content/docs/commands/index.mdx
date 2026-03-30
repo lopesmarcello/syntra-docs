@@ -6,6 +6,73 @@ section: commands
 
 ## CLI Commands
 
-Overview of all Syntra commands with a quick reference table.
+Use this page as the command map for the Syntra CLI. It shows what each core command is for,
+when it typically appears in the workflow, and where to go for full command-level details.
 
-> Content coming soon.
+## The common command flow
+
+Most teams use Syntra in this order:
+
+<Steps>
+	<Step title="Initialize once">
+		Run `syntra init` the first time you add Syntra to a repository. It scaffolds the `ai/`
+		directory, lets you choose instructions, agents, and adapters, then performs the first sync.
+	</Step>
+	<Step title="Add or update source files">
+		Use `syntra add` when you need a new instruction, agent, skill, or task file. Then edit the
+		canonical files in `ai/` as your project evolves.
+	</Step>
+	<Step title="Regenerate adapter output">
+		Run `syntra sync` after changing instructions, agents, skills, or tasks so generated adapter
+		files stay aligned with the source of truth.
+	</Step>
+	<Step title="Execute work">
+		Hand the synced task and instructions to your coding agent in the tool your team uses.
+	</Step>
+	<Step title="Close completed tasks">
+		Run `syntra done <taskId>` when work is finished so completed tasks move out of the active
+		queue.
+	</Step>
+	<Step title="Validate before merge">
+		Run `syntra validate` before committing or in CI to confirm the config, references, task
+		structure, and adapter outputs are still consistent.
+	</Step>
+</Steps>
+
+<Callout variant="info" title="Where templates fit">
+	`syntra template` is not part of the day-to-day loop. Use it after you have a setup your team
+	likes and want to reuse that same `ai/` baseline in future repositories.
+</Callout>
+
+## Quick reference
+
+| Command | Use it when | Typical example | Learn more |
+|---|---|---|---|
+| `syntra init` | You are setting up Syntra in a repository for the first time | `syntra init` | [syntra init](/docs/commands/init) |
+| `syntra add` | You need a new instruction, agent, task, or skill in `ai/` | `syntra add task` | [syntra add](/docs/commands/add) |
+| `syntra sync` | You changed canonical files and need fresh adapter output | `syntra sync` | [syntra sync](/docs/commands/sync) |
+| `syntra done` | A task is complete and should move from active to done | `syntra done TASK-1` | [syntra done](/docs/commands/done) |
+| `syntra validate` | You want to catch config, reference, or sync drift before shipping | `syntra validate` | [syntra validate](/docs/commands/validate) |
+| `syntra template` | You want to save or inspect reusable project setups | `syntra template save team-default` | [syntra template](/docs/commands/template) |
+
+## Choosing the right command
+
+- **Starting a new project?** Use `syntra init`.
+- **Need to create a new task or policy file?** Use `syntra add`.
+- **Edited anything under `ai/` and need generated files refreshed?** Use `syntra sync`.
+- **Finished implementation for an active task?** Use `syntra done`.
+- **About to commit, open a PR, or run CI?** Use `syntra validate`.
+- **Want the same setup in the next repository?** Use `syntra template`.
+
+## Notes for this project configuration
+
+The current [ai/config.yml](/docs/configuration/config-reference) enables GitHub Copilot,
+disables Claude Code and Cursor, and sets `sync.autoSync: true`. In practice, that means:
+
+- `syntra add` already triggers a sync automatically in this repository.
+- `syntra sync` is still the explicit command to run after manual edits to existing files in
+	`ai/`.
+- A plain `syntra sync` refreshes the enabled Copilot output for this project.
+
+Use the individual command pages for full details, examples, and edge cases. This overview is
+meant to help you choose the next command quickly without repeating every command-specific rule.

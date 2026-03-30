@@ -1,11 +1,440 @@
 ---
 title: Task Planner
-description: The task planner agent reference.
+description: How the task planner agent breaks down requirements.
 section: agents
 ---
 
 ## Task Planner
 
-The task planner agent reference.
+The task planner agent breaks down feature requests, bug reports, and requirements into structured task files that code generator can execute step by step. It focuses on decomposition, dependencies, and step quality.
 
-> Content coming soon.
+## When to Use Task Planner
+
+Use task planner when:
+- ✅ You have a vague feature request or idea
+- ✅ A requirement needs to be broken into executable steps
+- ✅ You're not sure where to start implementing
+- ✅ You need to identify dependencies between work items
+- ✅ You want clear steps for [Code Generator](/docs/agents/code-generator) to follow
+
+**Don't use task planner when:**
+- ❌ You already have a clear, structured task file — use [Code Generator](/docs/agents/code-generator) directly
+- ❌ You need to fix a bug — use [Bug Fixer](/docs/agents/bug-fixer) instead
+- ❌ You need feedback on existing code — use [Code Reviewer](/docs/agents/code-reviewer)
+
+## Input Types
+
+Task planner accepts any of these inputs:
+
+| Input Type | Example |
+|---|---|
+| **Feature Request** | "Add password reset functionality to the authentication flow" |
+| **Bug Report** | "Users' profile photos aren't loading on mobile devices" |
+| **Technical Requirement** | "Migrate database from PostgreSQL 11 to PostgreSQL 15" |
+| **Specification Document** | "Here's the complete spec for the new dashboard" |
+| **Broad Initiative** | "Improve API performance" |
+
+No matter the input format, task planner extracts requirements and breaks them into task files.
+
+## How Task Planner Works
+
+### Phase 1: Analyze the Requirement
+
+Task planner starts by understanding what's needed:
+
+1. **Read the requirement completely** — Understand the full picture, not just the first sentence
+2. **Identify affected parts** — Which modules, features, components are involved?
+3. **Look at existing code** — Understand current patterns, structure, and capabilities
+4. **List what needs to change** — What files, functions, features must be created or modified?
+
+This analysis prevents creating tasks that miss dependencies or skip necessary steps.
+
+### Phase 2: Decide — Single Task or Multiple?
+
+Task planner decides whether one task or multiple tasks are needed:
+
+#### **Single task when:**
+- Changes are in 1-3 related files
+- One logical unit of work
+- Can be reviewed as a single coherent change
+- Can be completed in one session
+
+**Example (Single Task):**
+```
+Feature: Add email validation to login form
+→ Single task (LoginForm component + validation tests)
+  - Add validateEmail() function
+  - Update form validation
+  - Add tests
+```
+
+#### **Multiple tasks when:**
+- Changes span many files or modules
+- Clear phases exist (e.g., create utility → use in component → test)
+- Some parts are independent
+- Clear dependencies exist (task B needs task A done first)
+- Work could be reviewed separately
+
+**Example (Multiple Tasks):**
+```
+Feature: Implement user authentication (password reset flow)
+→ Three tasks
+  Task 1: Create password reset email template
+  Task 2: Implement password reset endpoint and database logic
+  Task 3: Build password reset UI component
+  
+  Dependencies: Task 1 and 2 can be done in parallel, then Task 3
+```
+
+### Phase 3: Write Each Task
+
+For each task identified, task planner creates a file with this exact structure:
+
+```markdown
+# [TASK-ID]: [Short descriptive title]
+
+## Context
+[2-3 sentences explaining what this task is about, why it's needed, and how it fits 
+into the larger feature/fix. Include links to tickets or specs if available.]
+
+## References
+- Instructions: [list which instruction files apply]
+- Agent: code-generator
+
+## Dependencies
+[List any tasks that must be completed before this one, or "None"]
+
+## Steps
+1. [First concrete action]
+2. [Second action]
+3. [etc.]
+
+## Acceptance Criteria
+- [ ] [Specific, verifiable condition]
+- [ ] [Another condition]
+- [ ] [Test criteria]
+- [ ] [etc.]
+```
+
+## Task Structure Requirements
+
+### Context Section
+
+The context should explain:
+- **What**: What is this task building or fixing?
+- **Why**: Why is it needed? What problem does it solve?
+- **Where**: How does it fit into the larger feature or system?
+
+**Good context:**
+```
+This task implements email-based password reset for authenticated users. Users who forget 
+their password can request a reset link, receive it via email, and set a new password 
+without logging in. This is needed because we're removing SMS-based password resets due 
+to cost, and email is more reliable. This task handles the backend: token generation, 
+verification, and password update logic.
+```
+
+**Poor context:**
+```
+Add password reset. See ticket PROJ-123.
+```
+
+### References Section
+
+List which project instructions apply to this task:
+
+- **architecture.instructions.md** — Always, if files are being created/modified
+- **style.instructions.md** — Always for code quality
+- **testing.instructions.md** — Always if logic is being added
+- **security.instructions.md** — Always for user data or validation
+- **deploy.instructions.md** — If deployment or CI/CD changes are needed
+
+Keep these references so [Code Generator](/docs/agents/code-generator) knows what standards to follow.
+
+### Dependencies Section
+
+List tasks that must complete first:
+
+```
+## Dependencies
+None  ← If this can be done immediately
+
+OR
+
+## Dependencies
+- TASK-1: Create password reset email template
+```
+
+Listing dependencies helps coordinate work and prevents tasks that depend on unfinished work.
+
+### Steps Section
+
+Each step should be one specific action. Good steps are:
+
+**✅ One action** — Create a file, modify a function, add tests for X
+**✅ Specific** — Name the exact file, function, or component
+**✅ Ordered** — Later steps can depend on earlier ones
+**✅ Reviewable** — A human can look at the result and say "yes, that's correct"
+
+### Good Steps
+
+```
+## Steps
+1. Create `lib/passwordUtils.ts` with `generateResetToken()` function
+   - Generate 32-char random token
+   - Store hash in database with user_id and 1-hour expiration
+   - Return plain token to send via email
+
+2. Create `api/password-reset.ts` route handler
+   - POST /api/password-reset/request — accepts email, sends reset email if user exists
+   - POST /api/password-reset/verify — accepts token and new password
+   - Validate token hasn't expired
+   - Hash password before storing
+
+3. Add tests for password reset functions in `lib/passwordUtils.test.ts`
+   - Test token generation creates valid tokens
+   - Test expired tokens are rejected
+   - Test new password is properly hashed
+
+4. Update database schema
+   - Add password_reset_tokens table with columns: id, user_id, token_hash, expires_at
+```
+
+### Problematic Steps
+
+```
+❌ 1. Implement the password reset feature
+     Too vague — what exactly should be implemented?
+
+❌ 2. Fix stuff
+     Meaningless
+
+❌ 3. Update all files
+     No specifics about which files
+
+❌ 4. Create function, tests, and update component
+     Too many unrelated things in one step
+```
+
+### Acceptance Criteria Section
+
+Criteria must be **verifiable** — someone can look at the code and say "yes" or "no":
+
+**✅ Good criteria:**
+```
+## Acceptance Criteria
+- [ ] Password reset token is 32 characters and cryptographically random
+- [ ] Token expires after 1 hour and cannot be reused
+- [ ] New password is hashed with bcrypt before storage
+- [ ] Email endpoint returns 200 even if user doesn't exist (prevents email enumeration)
+- [ ] API properly validates token before allowing password change
+- [ ] All new functions have unit tests covering happy path and edge cases
+- [ ] Database migration creates password_reset_tokens table with proper indexes
+```
+
+**❌ Poor criteria:**
+```
+- [ ] Password reset works  ← Too vague, not measurable
+- [ ] Code is clean  ← Subjective, that's what instructions are for
+- [ ] Tests exist  ← Too vague, what tests?
+```
+
+### Include Testing in Every Task
+
+Every task that adds business logic must have a test step:
+
+```
+## Steps
+1. Create validation function
+2. Add tests for the validation function ← Always include this
+3. Use the validation in the component
+4. Test the component integration ← Or include this
+```
+
+## Rules for Task Planning
+
+### What Task Planner Must Do
+
+✅ **Understand the full requirement** before breaking it down
+✅ **Check existing code** to understand patterns and structure
+✅ **Identify all affected areas** — don't miss dependencies
+✅ **Number tasks in execution order** with clear dependencies
+✅ **Include testing steps** in every task
+✅ **Write specific, verifiable steps** — not vague intentions
+✅ **Make acceptance criteria measurable** — can be checked yes/no
+
+### What Task Planner Must Never Do
+
+❌ Don't invent requirements not in the original request
+❌ Don't include implementation details in steps (let code generator decide *how*)
+❌ Don't create tasks for refactoring or improvements not asked for
+❌ Don't skip testing steps
+❌ Don't create tasks you can't write clear acceptance criteria for
+❌ Don't guess at scope — ask for clarification when in doubt
+
+## Examples
+
+### Example 1: Single Task
+
+**Input:** "Add email validation to the login form"
+
+**Output:**
+```markdown
+# TASK-N: Add email validation to LoginForm
+
+## Context
+The LoginForm currently accepts any string as an email address. Users can submit 
+invalid emails, leading to failed authentication attempts and poor error messages. 
+This task adds format validation to prevent invalid emails from being submitted.
+
+## References
+- Instructions: architecture.instructions.md, style.instructions.md, testing.instructions.md, security.instructions.md
+- Agent: code-generator
+
+## Dependencies
+None
+
+## Steps
+1. Create `lib/validateEmail.ts` with `validateEmail(email: string): boolean`
+   - Return false for empty/null/undefined
+   - Return false if no @ symbol
+   - Return false if no domain extension (.com, .org, etc.)
+   - Return true for valid format emails
+
+2. Add tests in `lib/validateEmail.test.ts`
+   - Test valid email formats (user@example.com, first.last@subdomain.co.uk)
+   - Test invalid formats (missing @, no domain, spaces)
+   - Test edge cases (empty string, null, very long email)
+
+3. Update LoginForm to use validateEmail
+   - Import validateEmail function
+   - Check email validity before submitting
+   - Show error message if email is invalid
+   - Disable submit button until email is valid
+
+4. Add integration test for LoginForm email validation
+   - Test form rejects invalid email with error message
+   - Test form accepts valid email without error
+
+## Acceptance Criteria
+- [ ] Function rejects empty strings, null, and undefined
+- [ ] Function rejects emails without @ symbol
+- [ ] Function rejects emails without domain extension
+- [ ] Function accepts common valid formats (user@example.com, user+tag@example.co.uk)
+- [ ] LoginForm shows validation error for invalid emails
+- [ ] LoginForm disables submit until email is valid
+- [ ] All new functions have unit tests with >90% coverage
+- [ ] Integration test verifies form behavior with valid and invalid emails
+```
+
+### Example 2: Multiple Tasks
+
+**Input:** "Implement password reset functionality"
+
+**Task 1:**
+```markdown
+# TASK-N: Create password reset email template
+
+## Context
+Users who forget their password need to receive a reset link via email. This task 
+creates the HTML email template that will be sent when users request a password reset.
+
+## References
+- Instructions: style.instructions.md
+- Agent: code-generator
+
+## Dependencies
+None
+
+## Steps
+1. Create `emails/PasswordResetEmail.tsx` template component
+   - Accept reset URL as prop
+   - Create professional-looking HTML email
+   - Include reset link button
+   - Include expiration notice (1 hour)
+   - Include support contact information
+
+2. Add tests in `emails/PasswordResetEmail.test.tsx`
+   - Test template renders with valid URL
+   - Test expiration notice is displayed
+   - Test link is clickable
+
+## Acceptance Criteria
+- [ ] Email template is created as React component
+- [ ] Template renders valid HTML email format
+- [ ] Reset link is included and parameterized
+- [ ] Tests cover component rendering
+```
+
+**Task 2:**
+```markdown
+# TASK-N: Implement password reset endpoints
+
+## Context
+Backend API needs endpoints to handle password reset requests and token verification. 
+This task implements the API logic: generating tokens, validating them, and updating passwords.
+
+## References
+- Instructions: architecture.instructions.md, security.instructions.md, testing.instructions.md
+- Agent: code-generator
+
+## Dependencies
+TASK-N (Create password reset email template)
+
+## Steps
+1. Create `lib/passwordReset.ts` with reset logic
+   - `generateResetToken()` — create and store 32-char random token
+   - `verifyResetToken(token, email)` — check token is valid and not expired
+   - `resetPassword(email, newPassword)` — hash and update password
+
+2. Create `api/password-reset/[action].ts` route
+   - POST /api/password-reset/request — send reset email if user exists
+   - POST /api/password-reset/verify — verify token and new password
+   - Return appropriate error codes
+
+3. Add tests in `lib/passwordReset.test.ts`
+   - Test token generation and expiration
+   - Test password hashing
+   - Test all error cases
+
+## Acceptance Criteria
+- [ ] Reset tokens are 32 characters and cryptographically random
+- [ ] Tokens expire after 1 hour
+- [ ] Passwords are hashed with bcrypt
+- [ ] API returns 200 for non-existent emails (prevents enumeration)
+- [ ] All new functions have unit tests
+```
+
+## Tips for Task Planning
+
+### Ask Questions When Unclear
+- If the requirement is vague, ask for more details before planning
+- Don't guess at scope — it's better to ask and be specific
+
+### Look at Real Code
+- Check how similar features are implemented
+- Use those patterns as your decomposition guide
+- This helps code generator follow existing conventions
+
+### Balance Task Size
+- Too big: Code generator has too many steps, hard to review
+- Too small: Too many tasks create overhead
+- Sweet spot: 3-7 steps per task
+
+### Include All Context
+- Explain why this matters (not just what to build)
+- Link to requirements or specifications
+- Describe how it fits into the larger system
+
+### Dependencies Are Key
+- Identify what must be done first
+- Call out parallel work that can happen together
+- This helps coordinate multiple developers
+
+## See Also
+
+- **[Agents Overview](/docs/agents)** — Understand the agent model
+- **[Code Generator](/docs/agents/code-generator)** — Implements tasks step by step
+- **[Architecture Instructions](/docs/instructions/architecture)** — Project structure standards
+- **[Testing Instructions](/docs/instructions/testing)** — Test standards
+- **[Guides: Writing Tasks](/docs/guides/writing-tasks)** — Deep dive on task structure

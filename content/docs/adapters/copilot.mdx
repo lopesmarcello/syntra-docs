@@ -1,11 +1,52 @@
 ---
 title: GitHub Copilot
-description: GitHub Copilot adapter details and configuration.
+description: Copilot adapter outputs, config toggles, and sync behavior.
 section: adapters
 ---
 
 ## GitHub Copilot
 
-GitHub Copilot adapter details and configuration.
+The Copilot adapter renders Syntra's canonical `ai/` files into the file layout expected by GitHub Copilot in VS Code.
 
-> Content coming soon.
+## Generated files
+
+When Copilot sync runs, Syntra writes:
+
+- `.github/copilot-instructions.md`
+- `.github/agents/*.md`
+
+These files are derived from your `ai/instructions/` and `ai/agents/` source files.
+
+## Configuration
+
+Copilot behavior is controlled in `ai/config.yml`:
+
+```yaml
+adapters:
+	copilot:
+		enabled: true
+		instructionsMode: concatenated
+```
+
+| Key | Effect |
+|---|---|
+| `enabled` | If `true`, Copilot output is included in default `syntra sync` |
+| `instructionsMode` | Controls how instruction files are assembled (`concatenated` or `individual`) |
+
+## Sync behavior
+
+Use either of these commands:
+
+```bash
+syntra sync
+syntra sync --copilot
+```
+
+- `syntra sync` updates all enabled adapters
+- `syntra sync --copilot` updates only Copilot files
+
+Because this project currently has `adapters.copilot.enabled: true`, default sync refreshes `.github/`.
+
+<Callout variant="warning" title="Do not hand-edit .github output">
+	Any direct edits to `.github/copilot-instructions.md` or `.github/agents/*.md` are overwritten on the next sync.
+</Callout>

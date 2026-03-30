@@ -1,11 +1,60 @@
 ---
 title: Style Instructions
-description: Style instruction template reference.
+description: Define formatting and coding conventions that keep generated code consistent.
 section: instructions
 ---
 
 ## Style Instructions
 
-Style instruction template reference.
+Style instructions define how code should look and feel across the repository. They keep generated and human-authored code consistent, readable, and reviewable.
 
-> Content coming soon.
+Source file: `ai/instructions/style.instructions.md`
+
+## Purpose
+
+Use this module to standardize:
+
+- Formatting rules (indentation, quotes, line length, semicolons)
+- Commenting expectations
+- Function design constraints
+- Framework usage conventions
+- Lint/format tooling expectations
+
+This file complements architecture instructions: architecture answers *where and why*, style answers *how code should be written*.
+
+## Key sections
+
+The built-in style module currently includes:
+
+- **Formatting** — indentation, max line length, quotes, semicolons, trailing commas, braces.
+- **Comments** — explain why, TODO/HACK format, no commented-out code.
+- **JSDoc** — required for exported APIs and expected tags.
+- **Function Shape** — length, parameter count, guard clauses, purity, async patterns.
+- **Next.js Patterns** — Server Components defaults, fetching/mutations conventions.
+- **Linting & Formatting Tools** — ESLint/Prettier expectations.
+- **What AI Must Follow** — style priority and minimal-touch editing guidance.
+
+## When to customize
+
+Customize style instructions when:
+
+- Team conventions differ from built-in defaults
+- You introduce stricter API docs or naming rules
+- You want language/framework-specific formatting constraints
+- Linting/formatting toolchain changes
+
+Keep style rules objective where possible so reviewers and agents can enforce them consistently.
+
+## Authoring tips
+
+- Avoid duplicating architecture rules; reference them when needed.
+- Keep examples short and representative.
+- If existing repository code intentionally differs, call that out to avoid conflicting guidance.
+- Update style instructions first, then update lint rules/tooling so automation and policy stay aligned.
+
+## Related pages
+
+- [Architecture Instructions](/docs/instructions/architecture)
+- [Testing Instructions](/docs/instructions/testing)
+- [Custom Instructions](/docs/instructions/custom)
+

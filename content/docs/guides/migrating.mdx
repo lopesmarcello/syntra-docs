@@ -8,4 +8,79 @@ section: guides
 
 Migrating from manual AI instructions to Syntra.
 
-> Content coming soon.
+If your team currently edits `.github/`, `.claude/`, or `.cursor/` files directly, this guide helps you migrate to Syntra's canonical model where `ai/` is the source of truth.
+
+## Migration outcome
+
+After migration:
+
+- instructions, agents, tasks, and skills are maintained in `ai/`
+- adapter files are generated with `npx syntra sync`
+- drift is detected with `npx syntra validate`
+- task execution follows a consistent active → done lifecycle
+
+## Practical migration checklist
+
+<Steps>
+	<Step title="1) Inventory current manual files">
+		Identify all hand-maintained AI configuration artifacts (for example `.github/copilot-instructions.md`, `.github/agents/*.md`, `.claude/CLAUDE.md`, `.cursor/rules/*.mdc`).
+	</Step>
+	<Step title="2) Initialize Syntra">
+		Run:
+
+		```bash
+		npx syntra init
+		```
+
+		Select adapters you actually use so generated output matches your real workflow.
+	</Step>
+	<Step title="3) Move canonical content into ai/">
+		Port architecture/style/security/testing rules into `ai/instructions/`.
+		Port agent behavior into `ai/agents/`.
+		Add reusable patterns into `ai/skills/` if needed.
+	</Step>
+	<Step title="4) Configure lifecycle and safety settings">
+		Verify `ai/config.yml` values for `tasks.idPrefix`, `tasks.activeDir`, `tasks.doneDir`.
+		Keep `sync.warnManualEdits: true` enabled to catch direct adapter edits.
+	</Step>
+	<Step title="5) Regenerate adapter output">
+		Run:
+
+		```bash
+		npx syntra sync
+		```
+
+		Review generated diffs and ensure manual-only content has been captured in canonical files.
+	</Step>
+	<Step title="6) Validate before rollout">
+		Run:
+
+		```bash
+		npx syntra validate
+		```
+
+		Resolve missing references, task-structure issues, or sync warnings before team adoption.
+	</Step>
+	<Step title="7) Switch team habits">
+		Update contributing docs/process so teammates edit `ai/` files first, then sync and validate.
+	</Step>
+</Steps>
+
+## Manual-to-canonical mapping
+
+| Manual artifact (before) | Canonical source (after) |
+|---|---|
+| `.github/copilot-instructions.md` | `ai/instructions/*.instructions.md` + adapter sync |
+| `.github/agents/*.md` | `ai/agents/*.agent.md` + adapter sync |
+| `.claude/CLAUDE.md` | `ai/instructions/`, `ai/agents/`, `ai/config.yml` |
+| `.cursor/rules/*.mdc` | `ai/instructions/`, `ai/agents/`, `ai/config.yml` |
+
+## Rollout safeguards
+
+- Add `npx syntra validate` to CI.
+- Commit both `ai/` and generated adapter files.
+- Treat manual adapter edits as temporary emergency patches and back-port them to `ai/` immediately.
+
+<Callout variant="warning" title="Prevent drift">
+	If output files are edited directly, the next sync can overwrite those changes. Always update canonical files in `ai/` first.
+</Callout>

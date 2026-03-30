@@ -1,11 +1,63 @@
 ---
 title: Architecture Instructions
-description: Architecture instruction template reference.
+description: Define project structure, module boundaries, and file organization rules for all agents.
 section: instructions
 ---
 
 ## Architecture Instructions
 
-Architecture instruction template reference.
+Architecture instructions define how code and content should be organized in your repository. They prevent drift by setting stable rules for structure, naming, imports, and framework conventions.
 
-> Content coming soon.
+Source file: `ai/instructions/architecture.instructions.md`
+
+## Purpose
+
+Use this module to answer:
+
+- Where new files should live
+- How modules should be split
+- Which naming conventions are required
+- Which framework patterns are allowed
+- What boundaries agents must not cross
+
+For this project, the architecture file establishes that this is a Next.js App Router docs site with MDX content in `content/docs/`, rendering pages in `app/docs/`, and reusable components in `components/`.
+
+## Key sections
+
+The built-in architecture module currently defines these major sections:
+
+- **Project Overview** — tech stack and high-level architecture.
+- **Language Standards** — TypeScript strictness, typing rules, and enum preference.
+- **Project Structure** — canonical directory layout and responsibilities.
+- **Module Organization** — single responsibility, explicit exports, and no circular dependencies.
+- **Naming Conventions** — files, directories, symbols, constants, and booleans.
+- **Import Order** — ordered import groups with spacing expectations.
+- **Error Handling** — no silent failures and explicit async handling.
+- **Next.js Patterns** — Server Components by default, metadata patterns, and MDX usage.
+- **Dependencies** — dependency-addition guardrails.
+- **AI Agent Boundaries** — explicit “do not” constraints for scope control.
+
+## When to customize
+
+Customize architecture instructions when:
+
+- You add new top-level domains (for example `packages/` in a monorepo).
+- You adopt different naming/import conventions.
+- You introduce additional framework constraints (for example stricter server/client boundaries).
+- You want agents to enforce stronger scope limits for specific repositories.
+
+Keep architecture rules structural and durable. Avoid task-specific details in this file.
+
+## Authoring tips
+
+- Prefer concrete, testable statements over generic guidance.
+- Include examples where conventions are non-obvious.
+- Resolve conflicts between instructions and actual code patterns quickly; agents are told to follow existing code when conflicts appear.
+- Update this file first before asking agents to enforce new structure standards.
+
+## Related pages
+
+- [Style Instructions](/docs/instructions/style)
+- [Testing Instructions](/docs/instructions/testing)
+- [Security Instructions](/docs/instructions/security)
+- [Custom Instructions](/docs/instructions/custom)

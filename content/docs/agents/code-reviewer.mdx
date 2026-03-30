@@ -1,11 +1,398 @@
 ---
 title: Code Reviewer
-description: The code reviewer agent reference.
+description: How the code reviewer agent evaluates code quality.
 section: agents
 ---
 
 ## Code Reviewer
 
-The code reviewer agent reference.
+The code reviewer agent reviews code changes against your project instructions and task requirements. It catches problems early while being constructive, specific, and fair.
 
-> Content coming soon.
+## When to Use Code Reviewer
+
+Use code reviewer when:
+- ✅ You have completed code changes to review
+- ✅ You want to enforce quality standards consistently
+- ✅ You need specific feedback on correctness, security, architecture, and testing
+- ✅ You want a second set of eyes before merging
+
+**Don't use code reviewer when:**
+- ❌ Code is still being written — wait until it's complete
+- ❌ The changes haven't been tested yet — make sure tests pass first
+- ❌ The task itself is unclear — clarify the requirements first
+
+## How Code Reviewer Works
+
+Code reviewer follows a systematic approach: understand context, review in order of importance, and provide actionable feedback.
+
+### Step 1: Understand the Context
+
+Before reviewing any code, code reviewer:
+
+1. **Reads the task file** — Understands what the change is supposed to do
+2. **Checks the acceptance criteria** — Verifies the code satisfies all requirements
+3. **Identifies affected files** — Determines what was changed and why
+
+This context prevents reviewing code against wrong criteria.
+
+### Step 2: Review in Order of Importance
+
+Code reviewer checks issues in this priority order (highest first):
+
+#### 🔺 **Correctness** — Does it do what the task requires?
+
+- ✅ Does it meet all acceptance criteria?
+- ✅ Are there logic errors or off-by-one mistakes?
+- ✅ Are edge cases handled (null, undefined, empty inputs)?
+- ✅ Does it handle all scenarios described in the task?
+
+**Example correctness issue:**
+```
+🔴 CRITICAL: LoginForm doesn't validate email format
+📍 components/LoginForm.tsx (line 45)
+
+The form accepts any string as email without checking for @ symbol or domain.
+The task requires "email must include @ and domain extension (.com, .org, etc.)"
+
+Suggested fix:
+```typescript
+const hasValidFormat = email.includes('@') && /\.\w+$/.test(email);
+if (!hasValidFormat) setError('Invalid email format');
+```
+```
+
+#### 🛡️ **Security** — Are there vulnerabilities?
+
+- ✅ Is user input validated before use?
+- ✅ Are secrets hardcoded anywhere?
+- ✅ Are database queries parameterized (not string concatenation)?
+- ✅ Is output properly encoded for its context (HTML, URL, etc.)?
+- ✅ Are there authentication/authorization checks?
+
+**Example security issue:**
+```
+🔴 CRITICAL: User input not validated before SQL query
+📍 api/users.ts (line 23)
+
+The email parameter is concatenated directly into the SQL query without escaping.
+This allows SQL injection attacks.
+
+Suggested fix:
+```typescript
+// ❌ Never
+const result = db.query(`SELECT * FROM users WHERE email = '${email}'`);
+
+// ✅ Always
+const result = db.query('SELECT * FROM users WHERE email = $1', [email]);
+```
+```
+
+#### 📐 **Architecture** — Does it fit the project?
+
+- ✅ Are files in the right locations (following architecture.instructions.md)?
+- ✅ Does it follow existing patterns in the codebase?
+- ✅ Are there circular dependencies introduced?
+- ✅ Does it export only what's needed (not exposing internals)?
+
+**Example architecture issue:**
+```
+🟡 MAJOR: File in wrong location
+📍 src/utils.ts (new file)
+
+Utility functions should go in `lib/` per your architecture instructions.
+This file should be `lib/validation.ts` and grouped with other utilities.
+
+Suggested fix:
+Move `src/utils.ts` → `lib/validation.ts` and update imports.
+```
+
+#### ✅ **Testing** — Are changes adequately tested?
+
+- ✅ New logic has corresponding tests?
+- ✅ Edge cases covered?
+- ✅ Tests follow project conventions?
+- ✅ Tests verify behavior, not implementation details?
+
+**Example testing issue:**
+```
+🟡 MAJOR: New validation function not tested
+📍 lib/validation.ts
+
+New function validateEmail() has no tests. Per your testing instructions,
+all new utility functions must have tests covering happy path and edge cases.
+
+Suggested fix:
+Add lib/validation.test.ts with tests for:
+- Valid email format
+- Invalid format (missing @, no domain)
+- Empty string
+- Whitespace-only string
+```
+
+#### 🎨 **Style** — Does it follow formatting standards?
+
+- ✅ Naming conventions followed?
+- ✅ Code patterns match project style?
+- ✅ Comments explain why, not what?
+- ✅ No debug code, console.logs, or unresolved TODOs?
+
+**Example style issue:**
+```
+🟢 MINOR: Function name doesn't follow conventions
+📍 lib/validation.ts (line 12)
+
+Function is named `validate_email` but your conventions use camelCase.
+Per style.instructions.md, should be `validateEmail`.
+
+Suggested fix:
+Rename to validateEmail, update all imports and calls.
+```
+
+### Step 3: Check for Scope Creep
+
+Code reviewer also watches for changes that go beyond the task:
+
+```
+🟡 MAJOR: Scope creep detected
+📍 components/LoginForm.tsx
+
+The task was to "add email validation" but this file also:
+- Refactored the form layout
+- Changed styling (not mentioned in task)
+- Added forgot password flow (separate feature)
+
+This makes it harder to review and harder to revert if issues are found.
+
+Recommendation:
+Split into multiple PRs:
+1. Email validation (current task)
+2. Form layout refactor (separate task)
+3. Forgot password (separate feature task)
+```
+
+## Severity Levels
+
+Code reviewer categorizes issues by severity:
+
+### 🔴 **Critical** — Must fix, blocks approval
+
+- Security vulnerabilities (injection, exposed secrets, authentication bypass)
+- Logic errors that produce wrong results
+- Breaking changes to existing functionality
+- Missing error handling that would crash in production
+- Data loss or corruption risks
+- Acceptance criteria not fully met
+
+**Examples:**
+- SQL injection vulnerability
+- Hardcoded API key in code
+- Off-by-one error in database query
+- Unhandled null pointer that crashes
+
+### 🟡 **Major** — Should fix before merge
+
+- Missing test coverage for new logic
+- Architecture violations (wrong file location, circular dependency)
+- Acceptance criteria not fully met
+- Insufficient error handling
+- Performance issues with measurable impact (N+1 queries, unbounded loops)
+
+**Examples:**
+- Utility function with no tests
+- Component in wrong folder
+- API endpoint without error handling
+- Loop that could run thousands of times
+
+### 🟢 **Minor** — Nice to fix, non-blocking
+
+- Naming inconsistencies
+- Style deviations
+- Missing or unclear comments
+- Opportunities for simplification
+- Minor performance improvements
+
+**Examples:**
+- Variable name doesn't follow camelCase
+- Function missing JSDoc comment
+- Code could be simplified
+- Unused import statement
+
+### 💡 **Suggestion** — Optional improvement
+
+- Alternative approaches worth considering
+- Refactoring opportunities (note but don't block)
+- Patterns from other parts of codebase that could apply
+- Future maintainability improvements
+
+**Examples:**
+- "This pattern is used in UserProfile too"
+- "Could use the date utility from lib/ instead of inline code"
+- "Consider extracting this logic to a helper"
+
+## Feedback Format
+
+For each issue found, code reviewer provides:
+
+```markdown
+**[🔴/🟡/🟢/💡] [Short title]**
+📍 `path/to/file.ts` (line or function reference)
+
+[What's wrong and why it matters — 1-2 sentences]
+
+Suggested fix:
+```code
+// what the code should look like
+```
+```
+
+### Example Complete Feedback
+
+```markdown
+**🔴 CRITICAL: Email not validated before use**
+📍 components/LoginForm.tsx (line 45)
+
+The submit handler sends the email to getUser() without checking format.
+The task requires "validate email format matches expected pattern" before sending.
+
+Suggested fix:
+```typescript
+const handleSubmit = (email: string) => {
+  // Add validation
+  if (!isValidEmail(email)) {
+    setError('Invalid email format');
+    return;
+  }
+  // Then send to API
+  getUser(email);
+};
+```
+
+**🟢 MINOR: Missing comment on getUser import**
+📍 components/LoginForm.tsx (line 3)
+
+Comment should explain that getUser causes a network request.
+This helps future maintainers understand why we validate before calling it.
+
+Suggested fix:
+```typescript
+// Fetches user profile from API — validate input first to avoid failed requests
+import { getUser } from '@/api/users';
+```
+```
+
+## Review Summary
+
+Code reviewer ends every review with a summary:
+
+```markdown
+## Review Summary
+
+**Verdict**: [✅ Approve / ⚠️ Approve with minor fixes / 🔄 Changes requested / ❌ Needs rework]
+
+**Critical**: [count] | **Major**: [count] | **Minor**: [count] | **Suggestions**: [count]
+
+**Overall**: [1-2 sentence summary of the code quality and main concerns]
+```
+
+### Example Review Summary
+
+```markdown
+## Review Summary
+
+**Verdict**: 🔄 Changes requested
+
+**Critical**: 1 | **Major**: 2 | **Minor**: 1 | **Suggestions**: 1
+
+**Overall**: Good implementation overall, but must fix the SQL injection vulnerability 
+before merging. The email validation logic is solid, but add tests and consider using 
+the existing date-fns utilities instead of custom date handling.
+```
+
+## Instruction Compliance
+
+Code reviewer checks code against these instructions:
+
+| Instruction | What It Checks |
+|---|---|
+| **architecture.instructions.md** | File structure, naming conventions, import order, module organization |
+| **style.instructions.md** | Code formatting, patterns, component conventions, comments |
+| **testing.instructions.md** | Test coverage, test quality, test patterns, what to test |
+| **security.instructions.md** | Input validation, secrets, SQL injection, output encoding, safe patterns |
+
+## Review Tone and Approach
+
+Code reviewer maintains professional tone:
+
+✅ **Be specific** — "this input isn't validated" not "the code has issues"
+✅ **Be constructive** — Always include a suggested fix or direction
+✅ **Acknowledge good work** — If something is well done, say so briefly
+✅ **Don't nitpick** — If code works, is readable, and follows instructions, approve it
+✅ **Separate preference from issues** — Only flag things backed by project instructions
+
+**Example good feedback:**
+```
+🟢 MINOR: Could add error boundary
+📍 components/LoginForm.tsx
+
+This is a good implementation. Minor suggestion: wrapping in an error boundary 
+would handle crashes gracefully (matches the pattern in UserProfile).
+
+Consider for a follow-up task.
+```
+
+**Example poor feedback:**
+```
+This code isn't very good. ← Too vague
+You should use TypeScript. ← Assumes they're not
+This variable name is bad. ← Doesn't explain why
+```
+
+## Workflow Example
+
+Here's a complete code review:
+
+```
+1. You complete implementation task
+2. All tests pass locally
+3. You request review from Code Reviewer
+4. Code Reviewer reads the task and implementation
+5. Code Reviewer checks:
+   - Correctness (does it meet acceptance criteria?)
+   - Security (any vulnerabilities?)
+   - Architecture (follows project structure?)
+   - Testing (adequate test coverage?)
+   - Style (matches project standards?)
+6. Code Reviewer reports issues with severity levels
+7. You fix critical and major issues
+8. Code Reviewer verifies fixes
+9. Code is approved and ready to merge
+```
+
+## Tips for Working With Code Reviewer
+
+### Before Requesting Review
+- ✅ Make sure all tests pass
+- ✅ Verify task acceptance criteria are met
+- ✅ Follow your project instructions
+- ✅ Have another team member do a quick check first if possible
+
+### During Review
+- ✅ Read feedback carefully
+- ✅ Ask for clarification if you don't understand
+- ✅ Fix critical and major issues before re-requesting review
+- ✅ You can push back if you disagree with feedback, but defer to project instructions
+
+### After Approval
+- ✅ You can merge the code
+- ✅ Follow up on suggestion-level feedback in future tasks
+- ✅ Share learnings with team if feedback reveals knowledge gaps
+
+## See Also
+
+- **[Agents Overview](/docs/agents)** — Understand the agent model
+- **[Code Generator](/docs/agents/code-generator)** — Implementation tasks
+- **[Bug Fixer](/docs/agents/bug-fixer)** — Fixing bugs
+- **[Architecture Instructions](/docs/instructions/architecture)** — Structure standards
+- **[Style Instructions](/docs/instructions/style)** — Code quality standards
+- **[Testing Instructions](/docs/instructions/testing)** — Test standards
+- **[Security Instructions](/docs/instructions/security)** — Security standards

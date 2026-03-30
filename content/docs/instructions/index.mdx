@@ -1,11 +1,55 @@
 ---
 title: Instructions
-description: What instructions are and how they work in Syntra.
+description: Define project standards that every Syntra agent follows before writing code.
 section: instructions
 ---
 
 ## Instructions
 
-What instructions are and how they work in Syntra.
+Instruction files are the rulebook for your project. They define architecture, style, testing, security, and delivery constraints that agents must follow while planning, generating, reviewing, and fixing code.
 
-> Content coming soon.
+In Syntra, instructions are the long-lived source of truth; tasks are the short-lived unit of work. Keep instruction files stable and reusable, then keep task files focused on the specific change.
+
+## How instructions are consumed
+
+Agents read instruction files before they execute work.
+
+- **Code Generator** explicitly reads architecture, style, testing, and security instructions before implementing steps.
+- **Code Reviewer** checks changes against the same instruction set in review order: correctness, security, architecture, testing, then style.
+- **Bug Fixer** uses architecture/testing/style guidance during diagnosis and minimal-fix implementation.
+- **Task Planner** uses architecture and testing guidance to produce executable, testable tasks.
+
+Because multiple agents rely on the same instruction files, updates to instructions immediately affect planning, implementation, and review behavior.
+
+## Built-in instruction modules
+
+Syntra ships with five built-in instruction files in `ai/instructions/`:
+
+- [Architecture Instructions](/docs/instructions/architecture) — project structure, module boundaries, naming, import order, and framework patterns.
+- [Style Instructions](/docs/instructions/style) — formatting rules, function shape guidelines, and coding conventions.
+- [Testing Instructions](/docs/instructions/testing) — what to test, what not to test, mocking, and coverage expectations.
+- [Security Instructions](/docs/instructions/security) — secure defaults for input handling, secrets, auth patterns, and dependency safety.
+- [Deploy Instructions](/docs/instructions/deploy) — branch strategy, commit conventions, CI/CD expectations, and environment constraints.
+
+## Instruction lifecycle
+
+Use this cycle to keep instruction quality high:
+
+1. **Define baseline** in `ai/instructions/*.instructions.md`.
+2. **Reference from agents** so execution behavior is explicit.
+3. **Apply through tasks** using task references to relevant instruction files.
+4. **Review outcomes** and update instructions when recurring issues appear.
+5. **Sync adapters** so generated AI-tool outputs reflect instruction changes.
+
+## When to customize
+
+Customize built-in instructions when your team has specific standards (for example stricter testing thresholds, stricter branching policies, or domain-specific security rules). Keep changes concrete and verifiable.
+
+If your team needs rules outside the built-in five modules, add custom instruction files and reference them in the relevant agent files.
+
+## Related pages
+
+- [Custom Instructions](/docs/instructions/custom) — naming patterns, file structure, and integration steps.
+- [Agents](/docs/agents) — how each agent uses instruction files in practice.
+- [Configuration Overview](/docs/configuration) — how instruction changes propagate to adapters via sync.
+

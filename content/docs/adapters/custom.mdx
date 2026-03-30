@@ -6,6 +6,61 @@ section: adapters
 
 ## Custom Adapters
 
-How to create community adapters for Syntra.
+Custom adapters let you project Syntra's canonical `ai/` model into additional AI tools beyond Copilot, Claude Code, and Cursor.
 
-> Content coming soon.
+## Adapter extension model
+
+Syntra's built-in adapters all follow the same contract:
+
+1. Read canonical sources from `ai/`
+2. Resolve adapter toggles from `ai/config.yml`
+3. Transform instruction/agent/task content into target-tool file shapes
+4. Write generated files into a tool-specific output directory
+5. Overwrite prior generated output on every sync
+
+## Canonical inputs
+
+A custom adapter should consume the same source set as built-ins:
+
+- `ai/config.yml`
+- `ai/instructions/*.instructions.md`
+- `ai/agents/*.agent.md`
+- `ai/skills/*.skill.md`
+- `ai/tasks/active/*.task.md` and `ai/tasks/done/*.task.md`
+
+## Suggested config shape
+
+Use an adapter node that mirrors built-in semantics:
+
+```yaml
+adapters:
+	myTool:
+		enabled: true
+		instructionsMode: concatenated
+```
+
+- `enabled` gates whether your adapter runs in default sync
+- `instructionsMode` controls instruction aggregation strategy
+
+## Output strategy
+
+Define a stable output root for your target tool and keep all generated artifacts there.
+
+Example mapping pattern:
+
+- Canonical instructions → `<target>/instructions.*`
+- Canonical agents → `<target>/agents/*`
+- Optional task metadata → `<target>/tasks/*`
+
+Choose filenames that match your tool's documented conventions and keep generation deterministic.
+
+## Sync and validation expectations
+
+Custom adapters should preserve the same user experience as built-ins:
+
+- `syntra sync` regenerates output from canonical `ai/` files
+- target-specific sync should be possible (for example, a dedicated flag)
+- generated files are treated as disposable artifacts
+- manual edits in generated output are expected to be overwritten
+
+This keeps the core Syntra promise intact: one source of truth in `ai/`, many adapter targets.

@@ -1,0 +1,31 @@
+# TASK-6: Author Configuration Section Content
+
+## Context
+The configuration reference is partially documented, but section overview and key subpages for templates and project detection are still placeholders. This task completes the configuration section so users can understand `ai/config.yml` end-to-end and apply it confidently.
+
+## References
+- **Agent**: [code-generator](../agents/code-generator.agent.md)
+- **Instructions**:
+  - [architecture](../instructions/architecture.instructions.md)
+  - [style](../instructions/style.instructions.md)
+
+## Dependencies
+TASK-3
+
+## Steps
+1. [ ] Use `ai/tasks/active/TASK-3-audit.md` to confirm scope for `content/docs/configuration/{index,templates,project-detection}.mdx`.
+2. [ ] Replace placeholders in `content/docs/configuration/index.mdx`, `content/docs/configuration/templates.mdx`, and `content/docs/configuration/project-detection.mdx` with complete content.
+3. [ ] Reconcile new pages with `content/docs/configuration/config-reference.mdx` so terminology and key names are consistent.
+4. [ ] Document practical behaviors for template usage and project detection using only validated sources.
+5. [ ] Cross-check related command references (`syntra init`, `syntra template`, `syntra sync`, `syntra validate`) for consistency.
+
+## Acceptance Criteria
+- [ ] All three placeholder pages in `configuration/` are fully authored.
+- [ ] Configuration keys and examples match `ai/config.yml` and the existing config reference.
+- [ ] Template and project-detection pages provide actionable workflows, not just definitions.
+- [ ] Internal links and command references are valid and consistent.
+- [ ] No placeholder text remains in the configuration section.
+
+## Notes
+- Primary sources: `ai/config.yml`, `content/docs/configuration/config-reference.mdx`, `content/docs/commands/{init,template,sync,validate}.mdx`.
+- Preserve existing schema naming exactly.

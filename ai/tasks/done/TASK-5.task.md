@@ -1,0 +1,31 @@
+# TASK-5: Author Commands Section Content
+
+## Context
+The command reference pages exist for individual commands, but the commands landing page is still empty and the section needs one coherent quick-reference experience. This task completes the commands section documentation for all core CLI commands and ensures usage guidance is accurate and consistent.
+
+## References
+- **Agent**: [code-generator](../agents/code-generator.agent.md)
+- **Instructions**:
+  - [architecture](../instructions/architecture.instructions.md)
+  - [style](../instructions/style.instructions.md)
+
+## Dependencies
+TASK-3
+
+## Steps
+1. [ ] Use `ai/tasks/active/TASK-3-audit.md` to confirm command-section audience, scope, and required sources.
+2. [ ] Replace placeholder content in `content/docs/commands/index.mdx` with a full command overview, including when to use `init`, `add`, `sync`, `done`, `validate`, and `template`.
+3. [ ] Review `content/docs/commands/{init,add,sync,done,validate,template}.mdx` for consistency (terminology, workflow order, and config key references) and apply only targeted corrections.
+4. [ ] Ensure command examples align with configured behavior described in `ai/config.yml` and with lifecycle flow shown in guides.
+5. [ ] Validate section-level navigation clarity (overview page should route users to command-specific pages without duplication).
+
+## Acceptance Criteria
+- [ ] `content/docs/commands/index.mdx` has complete, non-placeholder content.
+- [ ] The overview page includes all six core commands and accurate intent for each.
+- [ ] Existing per-command docs remain internally consistent after targeted edits.
+- [ ] Command/config references are factually aligned with `ai/config.yml` and current docs workflow.
+- [ ] No placeholder text remains in the commands section.
+
+## Notes
+- Primary sources: `content/docs/commands/{init,add,sync,done,validate,template}.mdx`, `ai/config.yml`, `content/docs/guides/team-workflow.mdx`.
+- Keep examples and language practical and concise.
